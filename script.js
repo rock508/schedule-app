@@ -120,10 +120,12 @@ form.addEventListener("submit", (event) => {
 });
 
 voiceButton.addEventListener("click", () => {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
 
   if (!SpeechRecognition) {
-    aiMessage.textContent = "このブラウザは音声入力に対応していないみたい。文字で丁寧に褒めてくれたら許します。";
+    aiMessage.textContent =
+      "このブラウザは音声入力に対応していないみたい。文字で丁寧に褒めてくれたら許します。";
     return;
   }
 
@@ -154,7 +156,7 @@ function calculatePraiseScore(praise, title) {
 
   const normalized = text.toLowerCase();
   const uniqueHits = new Set(
-    praiseWords.filter((word) => normalized.includes(word.toLowerCase()))
+    praiseWords.filter((word) => normalized.includes(word.toLowerCase())),
   );
 
   let score = 0;
@@ -182,7 +184,8 @@ function updateScore() {
   scoreBar.classList.toggle("pass", score >= PASSING_SCORE);
 
   if (!praiseInput.value.trim()) {
-    aiMessage.textContent = "登録したいなら、まずは私の良さを70点以上で伝えてみなさい。";
+    aiMessage.textContent =
+      "登録したいなら、まずは私の良さを70点以上で伝えてみなさい。";
   } else if (score >= PASSING_SCORE) {
     aiMessage.textContent = `悪くないわね。${score}点なら、予定を覚える準備くらいはしてあげます。`;
   } else {
