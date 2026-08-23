@@ -4,6 +4,7 @@ const dateInput = document.querySelector("#eventDate");
 const timeInput = document.querySelector("#eventTime");
 const calendarGrid = document.querySelector("#calendarGrid");
 const currentMonth = document.querySelector("#currentMonth");
+const closeFormButton = document.querySelector("#closeForm");
 const today = new Date();
 const storageKey = "calendar-events";
 
@@ -24,7 +25,12 @@ form.addEventListener("submit", (event) => {
   displayedDate = new Date(`${dateInput.value}T00:00:00`);
   form.reset();
   dateInput.value = formatDate(today);
+  form.hidden = true;
   renderCalendar();
+});
+
+closeFormButton.addEventListener("click", () => {
+  form.hidden = true;
 });
 
 dateInput.addEventListener("change", () => {
@@ -57,6 +63,16 @@ function renderCalendar() {
     const dateKey = formatDate(date);
     const cell = document.createElement("article");
     cell.className = "day";
+    cell.tabIndex = 0;
+    cell.setAttribute("role", "button");
+    cell.setAttribute("aria-label", `${dateKey}の予定を追加`);
+    cell.addEventListener("click", () => openFormForDate(dateKey));
+    cell.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openFormForDate(dateKey);
+      }
+    });
     if (date.getMonth() !== month) cell.classList.add("muted");
     if (dateKey === formatDate(today)) cell.classList.add("today");
 
@@ -64,6 +80,14 @@ function renderCalendar() {
     number.className = "day-number";
     number.textContent = date.getDate();
     cell.append(number);
+
+    if (dateKey === formatDate(today)) {
+      const avatar = document.createElement("img");
+      avatar.className = "avatar-image";
+      avatar.src = "image.png";
+      avatar.alt = "今日のアバター";
+      cell.append(avatar);
+    }
 
     events
       .filter((item) => item.date === dateKey)
@@ -79,6 +103,14 @@ function renderCalendar() {
 
     calendarGrid.append(cell);
   }
+}
+
+function openFormForDate(dateKey) {
+  dateInput.value = dateKey;
+  displayedDate = new Date(`${dateKey}T00:00:00`);
+  form.hidden = false;
+  renderCalendar();
+  titleInput.focus();
 }
 
 function loadEvents() {
