@@ -1,87 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ご機嫌カレンダー</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="app-shell">
-    <section class="top-bar" aria-label="カレンダー操作">
-      <div>
-        <p class="eyebrow">Praise-Gated Calendar</p>
-        <h1>ご機嫌カレンダー</h1>
-      </div>
-      <div class="month-controls">
-        <button id="prevMonth" type="button" aria-label="前の月">‹</button>
-        <strong id="currentMonth"></strong>
-        <button id="nextMonth" type="button" aria-label="次の月">›</button>
-      </div>
-    </section>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>カレンダー</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="app">
+      <header class="header">
+        <h1>カレンダー</h1>
+        <nav class="month-nav" aria-label="月の移動">
+          <button id="previousMonth" type="button" aria-label="前の月">
+            ‹
+          </button>
+          <strong id="currentMonth"></strong>
+          <button id="nextMonth" type="button" aria-label="次の月">›</button>
+        </nav>
+      </header>
 
-    <section class="workspace">
-      <form id="eventForm" class="event-panel">
-        <div class="calendar-face" aria-live="polite">
-          <div class="face">✦</div>
-          <div>
-            <h2>その予定、私にとってメリットある？</h2>
-            <p id="aiMessage">登録したいなら、まずは私の良さを70点以上で伝えてみなさい。</p>
+      <section class="layout">
+        <form id="eventForm" class="event-form">
+          <h2>予定を追加</h2>
+          <label>予定名<input id="eventTitle" type="text" required /></label>
+          <label>日付<input id="eventDate" type="date" required /></label>
+          <label>時刻<input id="eventTime" type="time" /></label>
+          <button type="submit">追加</button>
+        </form>
+
+        <section class="calendar" aria-label="カレンダー">
+          <div class="weekdays" aria-hidden="true">
+            <span>日</span><span>月</span><span>火</span><span>水</span
+            ><span>木</span><span>金</span><span>土</span>
           </div>
-        </div>
-
-        <label>
-          予定名
-          <input id="eventTitle" type="text" placeholder="例: ハッカソン作業" required>
-        </label>
-
-        <div class="form-grid">
-          <label>
-            日付
-            <input id="eventDate" type="date" required>
-          </label>
-          <label>
-            時間
-            <input id="eventTime" type="time">
-          </label>
-        </div>
-
-        <label>
-          カレンダーへの褒め言葉
-          <textarea id="praiseText" rows="5" placeholder="例: いつも予定を覚えてくれて本当に助かってます。今日のデザインも知的で素敵です！" required></textarea>
-        </label>
-
-        <div class="score-row">
-          <div>
-            <span>ご機嫌スコア</span>
-            <strong id="scoreValue">0点</strong>
-          </div>
-          <div class="score-meter" aria-hidden="true">
-            <span id="scoreBar"></span>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button id="voiceButton" type="button">音声で褒める</button>
-          <button type="submit">予定をお願いする</button>
-        </div>
-      </form>
-
-      <section class="calendar-panel">
-        <div class="weekday-row">
-          <span>日</span>
-          <span>月</span>
-          <span>火</span>
-          <span>水</span>
-          <span>木</span>
-          <span>金</span>
-          <span>土</span>
-        </div>
-        <div id="calendarGrid" class="calendar-grid" aria-live="polite"></div>
+          <div id="calendarGrid" class="calendar-grid"></div>
+        </section>
       </section>
-    </section>
-  </main>
-
-  <script src="script.js"></script>
-</body>
+    </main>
+    <script src="script.js"></script>
+  </body>
 </html>
