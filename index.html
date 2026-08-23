@@ -20,8 +20,13 @@
       </header>
 
       <section class="layout">
-        <form id="eventForm" class="event-form">
-          <h2>予定を追加</h2>
+        <form id="eventForm" class="event-form" hidden>
+          <div class="form-heading">
+            <h2>予定を追加</h2>
+            <button id="closeForm" type="button" aria-label="フォームを閉じる">
+              ×
+            </button>
+          </div>
           <label>予定名<input id="eventTitle" type="text" required /></label>
           <label>日付<input id="eventDate" type="date" required /></label>
           <label>時刻<input id="eventTime" type="time" /></label>

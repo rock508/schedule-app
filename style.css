@@ -13,8 +13,8 @@
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    linear-gradient(135deg, #eaf3ff, transparent 45%), var(--background);
+  background: var(--background) url("画像倉庫/草原背景.png") center / cover
+    fixed;
   color: var(--ink);
   font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
 }
@@ -90,6 +90,22 @@ h2 {
   display: grid;
   gap: 14px;
 }
+.event-form[hidden] {
+  display: none;
+}
+.form-heading {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+.form-heading button {
+  background: transparent;
+  color: var(--muted);
+  font-size: 1.5rem;
+  min-height: 32px;
+  padding: 0;
+  width: 32px;
+}
 label {
   color: var(--muted);
   display: grid;
@@ -129,6 +145,10 @@ input {
   min-height: 108px;
   padding: 8px;
 }
+.day:focus-visible {
+  outline: 3px solid var(--today);
+  outline-offset: -3px;
+}
 .day.muted {
   background: #f1f2f4;
   color: #9aa1ad;
@@ -145,6 +165,14 @@ input {
   background: var(--today);
   border-radius: 50%;
   color: white;
+}
+.avatar-image {
+  display: block;
+  height: 48px;
+  margin: 8px auto 4px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  max-width: 100%;
 }
 .event {
   background: #eaf3ff;
