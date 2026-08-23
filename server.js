@@ -5,6 +5,7 @@ const cors = require("cors");
 const app = express();
 app.use(cors()); // フロントエンド（Go Live）からの通信を許可する設定
 app.use(express.json());
+app.use(express.static(__dirname));
 
 // 💡 【重要】あなたのGemini APIキーをここに貼り付けてください
 const GEMINI_API_KEY = "ここにあなたのAPIキーを入れる";
@@ -54,6 +55,8 @@ app.post("/api/check-schedule", async (req, res) => {
 });
 
 // 3000番ポートでお留守番を開始
-app.listen(3000, () =>
-  console.log("🚀 ツンデレNode.jsサーバーが3000番ポートで起動したわよ！"),
-);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 ツンデレNode.jsサーバーが${PORT}番ポートで起動したわよ！`);
+  console.log(`🔗 アクセス先: http://localhost:${PORT}`);
+});
