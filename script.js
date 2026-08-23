@@ -84,7 +84,7 @@ function renderCalendar() {
     if (dateKey === formatDate(today)) {
       const avatar = document.createElement("img");
       avatar.className = "avatar-image";
-      avatar.src = "image.png";
+      avatar.src = "画像倉庫/image.png";
       avatar.alt = "今日のアバター";
       cell.append(avatar);
     }
