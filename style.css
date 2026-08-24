@@ -155,6 +155,61 @@ button {
   z-index: 10;
 }
 
+.level-up-effect {
+  align-items: center;
+  background: rgba(20, 16, 10, 0.92);
+  border: 4px solid #ffd74a;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 8px rgba(255, 215, 74, 0.2),
+    0 8px 30px rgba(0, 0, 0, 0.45);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  left: 50%;
+  padding: 28px 36px;
+  pointer-events: none;
+  position: fixed;
+  text-align: center;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0.7);
+  z-index: 20;
+}
+
+.level-up-effect strong {
+  color: #ffd74a;
+  font-size: clamp(2rem, 6vw, 4rem);
+  text-shadow: 0 2px 8px rgba(255, 196, 0, 0.75);
+  white-space: nowrap;
+}
+
+.level-up-effect span {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.level-up-show {
+  animation: level-up-show 1.8s ease forwards;
+}
+
+@keyframes level-up-show {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  20%,
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+}
+
 .status-button {
   background: #20242c;
   border: 2px solid #fff;
