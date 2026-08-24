@@ -149,14 +149,14 @@ h2 {
 }
 .form-heading button {
   background: transparent;
-  color: var(--muted);
+  color: #20242c;
   font-size: 1.5rem;
   min-height: 32px;
   padding: 0;
   width: 32px;
 }
 label {
-  color: var(--muted);
+  color: #20242c;
   display: grid;
   font-size: 0.88rem;
   font-weight: 700;
@@ -170,6 +170,12 @@ input {
 }
 .event-form button {
   margin-top: 4px;
+}
+.event-form button[hidden] {
+  display: none;
+}
+.event-form #deleteEvent {
+  background: #9b2c2c;
 }
 .calendar-grid {
   display: grid;
@@ -251,6 +257,10 @@ input {
   padding: 4px 5px;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.event:focus-visible {
+  outline: 3px solid var(--today);
+  outline-offset: 2px;
 }
 
 @media (max-width: 720px) {
