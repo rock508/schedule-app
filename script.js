@@ -5,32 +5,53 @@ const timeInput = document.querySelector("#eventTime");
 const calendarGrid = document.querySelector("#calendarGrid");
 const currentMonth = document.querySelector("#currentMonth");
 const closeFormButton = document.querySelector("#closeForm");
+const deleteEventButton = document.querySelector("#deleteEvent");
 const today = new Date();
 const storageKey = "calendar-events";
 
 let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
+let editingEventIndex = null;
 
 dateInput.value = formatDate(today);
 renderCalendar();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
-  events.push({
+  const eventData = {
     title: titleInput.value.trim(),
     date: dateInput.value,
     time: timeInput.value,
-  });
+  };
+  if (editingEventIndex === null) {
+    events.push(eventData);
+  } else {
+    events[editingEventIndex] = eventData;
+  }
   localStorage.setItem(storageKey, JSON.stringify(events));
   displayedDate = new Date(`${dateInput.value}T00:00:00`);
   form.reset();
   dateInput.value = formatDate(today);
   form.hidden = true;
+  editingEventIndex = null;
+  deleteEventButton.hidden = true;
   renderCalendar();
 });
 
 closeFormButton.addEventListener("click", () => {
   form.hidden = true;
+  editingEventIndex = null;
+  deleteEventButton.hidden = true;
+});
+
+deleteEventButton.addEventListener("click", () => {
+  if (editingEventIndex === null) return;
+  events.splice(editingEventIndex, 1);
+  localStorage.setItem(storageKey, JSON.stringify(events));
+  form.hidden = true;
+  editingEventIndex = null;
+  deleteEventButton.hidden = true;
+  renderCalendar();
 });
 
 dateInput.addEventListener("change", () => {
@@ -109,9 +130,24 @@ function renderCalendar() {
       .forEach((item) => {
         const eventElement = document.createElement("div");
         eventElement.className = "event";
+        eventElement.tabIndex = 0;
+        eventElement.setAttribute("role", "button");
+        eventElement.setAttribute("aria-label", `${item.title}を編集`);
         eventElement.textContent = item.time
           ? `${item.time} ${item.title}`
           : item.title;
+        const eventIndex = events.indexOf(item);
+        eventElement.addEventListener("click", (event) => {
+          event.stopPropagation();
+          openFormForEvent(eventIndex);
+        });
+        eventElement.addEventListener("keydown", (event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            event.stopPropagation();
+            openFormForEvent(eventIndex);
+          }
+        });
         cell.append(eventElement);
       });
 
@@ -120,9 +156,27 @@ function renderCalendar() {
 }
 
 function openFormForDate(dateKey) {
+  editingEventIndex = null;
+  deleteEventButton.hidden = true;
+  titleInput.value = "";
+  timeInput.value = "";
   dateInput.value = dateKey;
   displayedDate = new Date(`${dateKey}T00:00:00`);
   form.hidden = false;
+  renderCalendar();
+  titleInput.focus();
+}
+
+function openFormForEvent(eventIndex) {
+  const item = events[eventIndex];
+  if (!item) return;
+  editingEventIndex = eventIndex;
+  titleInput.value = item.title;
+  dateInput.value = item.date;
+  timeInput.value = item.time || "";
+  form.hidden = false;
+  deleteEventButton.hidden = false;
+  displayedDate = new Date(`${item.date}T00:00:00`);
   renderCalendar();
   titleInput.focus();
 }
