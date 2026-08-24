@@ -7,21 +7,9 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <main id="homeScreen" class="home-screen">
-      <div class="home-account-buttons">
-        <button type="button">ログイン</button>
-        <button type="button">ログアウト</button>
-      </div>
-      <button class="settings-button" type="button">設定</button>
-      <div class="home-actions">
-        <button id="startScheduleButton" type="button">スケジュール開始</button>
-        <button id="guestPlayButton" type="button">ゲストでプレイ</button>
-      </div>
-    </main>
 
-    <main id="calendarScreen" class="app" hidden>
+
       <header class="header">
-        <h1>カレンダー</h1>
         <nav class="month-nav" aria-label="月の移動">
           <button id="previousMonth" type="button" aria-label="前の月">
             ‹
@@ -43,6 +31,7 @@
           <label>日付<input id="eventDate" type="date" required /></label>
           <label>時刻<input id="eventTime" type="time" /></label>
           <button type="submit">追加</button>
+          <button id="deleteEvent" type="button" hidden>削除</button>
         </form>
 
         <section class="calendar-board" aria-label="カレンダーボード">
