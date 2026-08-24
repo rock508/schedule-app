@@ -40,6 +40,10 @@
       <button id="backHomeButton" class="back-home-button" type="button">
         戻る
       </button>
+      <div id="levelUpEffect" class="level-up-effect" hidden aria-live="polite">
+        <strong>能力アップ！</strong>
+        <span>HP +1　攻撃 +1　防御 +1　すばやさ +1</span>
+      </div>
       <div class="status-area">
         <button
           id="statusButton"
@@ -104,7 +108,7 @@
             <label>時刻<input id="eventTime" type="time" /></label>
             <button type="submit">追加</button>
             <button id="deleteEvent" type="button" hidden>削除</button>
-            <button id="completeEvent" type="button">完了</button>
+            <button id="completeEvent" type="button" hidden>完了</button>
           </form>
 
           <section class="calendar-board" aria-label="カレンダーボード">
