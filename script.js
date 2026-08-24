@@ -199,12 +199,16 @@ logoutButton.addEventListener("click", async () => {
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
+    loginButton.hidden = true;
+    logoutButton.hidden = false;
     userName.textContent = user.displayName || user.email || "Googleユーザー";
     userPhoto.src = user.photoURL || "";
     userProfile.hidden = false;
     console.log("ログインユーザー:", user.displayName);
     return;
   }
+  loginButton.hidden = false;
+  logoutButton.hidden = true;
   userName.textContent = "";
   userPhoto.removeAttribute("src");
   userProfile.hidden = true;
