@@ -1,5 +1,5 @@
 :root {
-  --ink: #8d96a8;
+  --ink: #030303;
   --muted: #68707f;
   --line: #dfe3ea;
   --background: #f7f3ed;
@@ -151,6 +151,13 @@ button {
   box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
 }
 
+.battle-reset-button {
+  background: #b42318;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
+  margin-left: 8px;
+}
+
 .status-panel {
   background: rgba(255, 255, 255, 0.96);
   border: 2px solid #20242c;
@@ -213,6 +220,15 @@ button {
   margin: 0 0 10px;
 }
 
+.boss-image {
+  display: block;
+  image-rendering: pixelated;
+  margin: 0 auto 10px;
+  max-height: 130px;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 .battle-panel button:disabled {
   background: #9aa1ad;
   cursor: not-allowed;
@@ -221,6 +237,13 @@ button {
 #battleMessage {
   color: var(--muted);
   font-size: 0.9rem;
+}
+
+#bossHpBar {
+  display: block;
+  height: 16px;
+  margin: 0 auto 10px;
+  width: min(100%, 360px);
 }
 .header {
   align-items: center;
