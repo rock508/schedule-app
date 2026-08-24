@@ -12,14 +12,13 @@
         <button id="loginButton" type="button">ログイン</button>
         <button id="logoutButton" type="button">ログアウト</button>
       </div>
+      <div id="userProfile" class="user-profile" hidden>
+        <img id="userPhoto" src="" alt="Googleアカウントのアイコン" />
+        <span id="userName"></span>
+      </div>
       <button id="settingsButton" class="settings-button" type="button">
         設定
       </button>
-      <section id="loginPanel" class="home-popup login-panel" hidden>
-        <h2>ログイン</h2>
-        <label>パスワード<input id="loginPassword" type="password" /></label>
-        <button id="confirmLoginButton" type="button">ログインする</button>
-      </section>
       <section id="settingsPanel" class="home-popup settings-panel" hidden>
         <h2>設定</h2>
         <label
@@ -163,6 +162,6 @@
         </section>
       </div>
     </main>
-    <script src="script.js"></script>
+    <script type="module" src="script.js"></script>
   </body>
 </html>

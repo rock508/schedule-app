@@ -59,6 +59,32 @@ button {
   left: 3%;
 }
 
+.user-profile {
+  align-items: center;
+  background: rgba(48, 25, 20, 0.9);
+  border: 2px solid #d2a16a;
+  color: #ffe2ad;
+  display: flex;
+  gap: 8px;
+  left: 3%;
+  max-width: 240px;
+  padding: 6px 10px;
+  position: absolute;
+  top: 12%;
+  z-index: 1;
+}
+
+.user-profile[hidden] {
+  display: none;
+}
+
+.user-profile img {
+  border-radius: 50%;
+  height: 32px;
+  object-fit: cover;
+  width: 32px;
+}
+
 .settings-button {
   right: 3%;
 }
