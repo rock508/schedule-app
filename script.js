@@ -6,10 +6,19 @@ const calendarGrid = document.querySelector("#calendarGrid");
 const currentMonth = document.querySelector("#currentMonth");
 const closeFormButton = document.querySelector("#closeForm");
 const deleteEventButton = document.querySelector("#deleteEvent");
+const completeEventButton = document.querySelector("#completeEvent");
+const levelUpEffect = document.querySelector("#levelUpEffect");
 const statusButton = document.querySelector("#statusButton");
 const statusPanel = document.querySelector("#statusPanel");
+const statElements = {
+  hp: document.querySelector("#statHp"),
+  attack: document.querySelector("#statAttack"),
+  defense: document.querySelector("#statDefense"),
+  speed: document.querySelector("#statSpeed"),
+};
 const homeScreen = document.querySelector("#homeScreen");
 const calendarScreen = document.querySelector("#calendarScreen");
+const backHomeButton = document.querySelector("#backHomeButton");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
 const autoBattleButton = document.querySelector("#autoBattleButton");
@@ -31,12 +40,16 @@ const today = new Date();
 const storageKey = "calendar-events";
 const accountStorageKey = "schedule-account";
 const settingsStorageKey = "schedule-settings";
+const statsStorageKey = "schedule-stats";
 
 let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
 let editingEventIndex = null;
 let battleDone = false;
+let stats = loadStats();
 const savedSettings = loadSettings();
+
+renderStats();
 
 volumeControl.value = savedSettings.volume;
 brightnessControl.value = savedSettings.brightness;
@@ -54,8 +67,14 @@ function openCalendar() {
   loadBattleStatus();
 }
 
+function openHome() {
+  calendarScreen.hidden = true;
+  homeScreen.hidden = false;
+}
+
 startScheduleButton.addEventListener("click", openCalendar);
 guestPlayButton.addEventListener("click", openCalendar);
+backHomeButton.addEventListener("click", openHome);
 
 autoBattleButton.addEventListener("click", async () => {
   autoBattleButton.disabled = true;
@@ -182,6 +201,7 @@ form.addEventListener("submit", (event) => {
   form.hidden = true;
   editingEventIndex = null;
   deleteEventButton.hidden = true;
+  completeEventButton.hidden = true;
   renderCalendar();
 });
 
@@ -189,6 +209,7 @@ closeFormButton.addEventListener("click", () => {
   form.hidden = true;
   editingEventIndex = null;
   deleteEventButton.hidden = true;
+  completeEventButton.hidden = true;
 });
 
 deleteEventButton.addEventListener("click", () => {
@@ -198,6 +219,34 @@ deleteEventButton.addEventListener("click", () => {
   form.hidden = true;
   editingEventIndex = null;
   deleteEventButton.hidden = true;
+  completeEventButton.hidden = true;
+  renderCalendar();
+});
+
+completeEventButton.addEventListener("click", () => {
+  if (editingEventIndex === null) return;
+  events.splice(editingEventIndex, 1);
+  localStorage.setItem(storageKey, JSON.stringify(events));
+  Object.keys(stats).forEach((stat) => {
+    stats[stat] += 1;
+  });
+  localStorage.setItem(statsStorageKey, JSON.stringify(stats));
+  renderStats();
+  form.hidden = true;
+  editingEventIndex = null;
+  deleteEventButton.hidden = true;
+  completeEventButton.hidden = true;
+  statusPanel.hidden = false;
+  statusButton.setAttribute("aria-expanded", "true");
+  statusPanel.classList.remove("stats-increased");
+  statusButton.classList.remove("stats-increased");
+  levelUpEffect.hidden = false;
+  levelUpEffect.classList.remove("level-up-show");
+  requestAnimationFrame(() => {
+    statusPanel.classList.add("stats-increased");
+    statusButton.classList.add("stats-increased");
+    levelUpEffect.classList.add("level-up-show");
+  });
   renderCalendar();
 });
 
@@ -306,6 +355,8 @@ function renderCalendar() {
 function openFormForDate(dateKey) {
   editingEventIndex = null;
   deleteEventButton.hidden = true;
+  completeEventButton.hidden = true;
+  levelUpEffect.hidden = true;
   titleInput.value = "";
   timeInput.value = "";
   dateInput.value = dateKey;
@@ -324,9 +375,17 @@ function openFormForEvent(eventIndex) {
   timeInput.value = item.time || "";
   form.hidden = false;
   deleteEventButton.hidden = false;
+  completeEventButton.hidden = false;
+  levelUpEffect.hidden = true;
   displayedDate = new Date(`${item.date}T00:00:00`);
   renderCalendar();
   titleInput.focus();
+}
+
+function renderStats() {
+  Object.entries(statElements).forEach(([stat, element]) => {
+    element.textContent = stats[stat];
+  });
 }
 
 function loadEvents() {
@@ -347,6 +406,20 @@ function loadSettings() {
     };
   } catch {
     return { volume: 70, brightness: 100 };
+  }
+}
+
+function loadStats() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(statsStorageKey));
+    return {
+      hp: saved?.hp ?? 1,
+      attack: saved?.attack ?? 1,
+      defense: saved?.defense ?? 1,
+      speed: saved?.speed ?? 1,
+    };
+  } catch {
+    return { hp: 1, attack: 1, defense: 1, speed: 1 };
   }
 }
 
