@@ -83,11 +83,23 @@ h2 {
   grid-template-columns: 240px minmax(0, 1fr);
 }
 .event-form,
-.calendar {
-  background: rgba(255, 255, 255, 0.88);
+.calendar-board {
+  background: #b77c43;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 18px;
+}
+.calendar-board {
+  overflow: hidden;
+  position: relative;
+}
+.calendar-board-image {
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+  position: absolute;
+  width: 100%;
+  z-index: 0;
 }
 .event-form {
   display: grid;
@@ -125,43 +137,60 @@ input {
 .event-form button {
   margin-top: 4px;
 }
-.weekdays,
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
 }
-.weekdays span {
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: 8px;
-  text-align: center;
-}
 .calendar-grid {
   border-left: 1px solid var(--line);
   border-top: 1px solid var(--line);
+  position: relative;
+  z-index: 1;
+}
+.weekday {
+  background: rgba(48, 32, 22, 0.66);
+  border-radius: 3px;
+  color: #fff;
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 6px;
+  padding: 4px 0;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
 }
 .day {
-  background: white;
+  background: transparent;
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
   min-height: 108px;
-  padding: 8px;
+  padding: 8px 6px;
 }
 .day:focus-visible {
   outline: 3px solid var(--today);
   outline-offset: -3px;
 }
 .day.muted {
-  background: #f1f2f4;
+  background: transparent;
   color: #9aa1ad;
+}
+.day.muted .weekday {
+  background: rgba(48, 32, 22, 0.45);
+  color: #fff;
+}
+.day.empty {
+  background: transparent;
 }
 .day-number {
   align-items: center;
+  color: var(--ink);
   display: flex;
+  font-size: 1rem;
   font-weight: 700;
   height: 26px;
   justify-content: center;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.85);
   width: 26px;
 }
 .today .day-number {
@@ -213,7 +242,11 @@ input {
   }
   .day {
     min-height: 82px;
-    padding: 5px;
+    padding: 5px 3px;
+  }
+  .weekday {
+    font-size: 0.8rem;
+    padding: 3px 0;
   }
   .event {
     font-size: 0.7rem;
