@@ -1,5 +1,5 @@
 :root {
-  --ink: #8d96a8;
+  --ink: #0e1012;
   --muted: #68707f;
   --line: #dfe3ea;
   --background: #f7f3ed;
@@ -141,6 +141,16 @@ button {
 .status-area {
   position: fixed;
   right: 18px;
+  top: 18px;
+  z-index: 10;
+}
+
+.back-home-button {
+  background: #20242c;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
+  left: 18px;
+  position: fixed;
   top: 18px;
   z-index: 10;
 }

@@ -10,6 +10,7 @@ const statusButton = document.querySelector("#statusButton");
 const statusPanel = document.querySelector("#statusPanel");
 const homeScreen = document.querySelector("#homeScreen");
 const calendarScreen = document.querySelector("#calendarScreen");
+const backHomeButton = document.querySelector("#backHomeButton");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
 const loginButton = document.querySelector("#loginButton");
@@ -46,8 +47,14 @@ function openCalendar() {
   calendarScreen.hidden = false;
 }
 
+function openHome() {
+  calendarScreen.hidden = true;
+  homeScreen.hidden = false;
+}
+
 startScheduleButton.addEventListener("click", openCalendar);
 guestPlayButton.addEventListener("click", openCalendar);
+backHomeButton.addEventListener("click", openHome);
 
 loginButton.addEventListener("click", () => {
   loginPanel.hidden = false;
