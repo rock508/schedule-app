@@ -325,6 +325,25 @@ input {
 .event-form #deleteEvent {
   background: #9b2c2c;
 }
+.event-form #completeEvent {
+  background: #27734a;
+}
+.stats-increased {
+  animation: stats-increased 700ms ease;
+}
+@keyframes stats-increased {
+  0%,
+  100% {
+    box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
+    transform: scale(1);
+  }
+  45% {
+    box-shadow:
+      0 0 0 6px rgba(255, 215, 74, 0.55),
+      0 3px 18px rgba(255, 196, 0, 0.65);
+    transform: scale(1.04);
+  }
+}
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
