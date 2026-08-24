@@ -49,6 +49,55 @@ button {
   box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
 }
 
+.status-area {
+  position: fixed;
+  right: 18px;
+  top: 18px;
+  z-index: 10;
+}
+
+.status-button {
+  background: #20242c;
+  border: 2px solid #fff;
+  box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
+}
+
+.status-panel {
+  background: rgba(255, 255, 255, 0.96);
+  border: 2px solid #20242c;
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(38, 28, 18, 0.22);
+  margin-top: 8px;
+  padding: 14px 16px;
+  width: 150px;
+}
+
+.status-panel h2 {
+  color: #20242c;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+.status-panel dl {
+  color: #20242c;
+  margin: 0;
+}
+
+.status-panel dl div {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+}
+
+.status-panel dt,
+.status-panel dd {
+  margin: 0;
+}
+
+.status-panel dd {
+  font-weight: 800;
+}
+
 .account-buttons .login-button {
   background: #fff;
   color: #20242c;

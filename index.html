@@ -11,9 +11,40 @@
       <button class="logout-button" type="button">ログアウト</button>
       <button class="login-button" type="button">ログイン</button>
     </div>
+    <div class="status-area">
+      <button
+        id="statusButton"
+        class="status-button"
+        type="button"
+        aria-expanded="false"
+      >
+        ステータス
+      </button>
+      <section
+        id="statusPanel"
+        class="status-panel"
+        aria-label="能力一覧"
+        hidden
+      >
+        <h2>能力</h2>
+        <dl>
+          <div>
+            <dt>HP</dt>
+            <dd>1</dd>
+          </div>
+          <div>
+            <dt>攻撃</dt>
+            <dd>1</dd>
+          </div>
+          <div>
+            <dt>防御</dt>
+            <dd>1</dd>
+          </div>
+        </dl>
+      </section>
+    </div>
     <main class="app">
       <header class="header">
-        <h1>カレンダー</h1>
         <nav class="month-nav" aria-label="月の移動">
           <button id="previousMonth" type="button" aria-label="前の月">
             ‹
