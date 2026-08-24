@@ -8,6 +8,10 @@ const closeFormButton = document.querySelector("#closeForm");
 const deleteEventButton = document.querySelector("#deleteEvent");
 const statusButton = document.querySelector("#statusButton");
 const statusPanel = document.querySelector("#statusPanel");
+const homeScreen = document.querySelector("#homeScreen");
+const calendarScreen = document.querySelector("#calendarScreen");
+const startScheduleButton = document.querySelector("#startScheduleButton");
+const guestPlayButton = document.querySelector("#guestPlayButton");
 const today = new Date();
 const storageKey = "calendar-events";
 
@@ -20,6 +24,14 @@ statusButton.addEventListener("click", () => {
   statusPanel.hidden = !isHidden;
   statusButton.setAttribute("aria-expanded", String(isHidden));
 });
+
+function openCalendar() {
+  homeScreen.hidden = true;
+  calendarScreen.hidden = false;
+}
+
+startScheduleButton.addEventListener("click", openCalendar);
+guestPlayButton.addEventListener("click", openCalendar);
 
 dateInput.value = formatDate(today);
 renderCalendar();

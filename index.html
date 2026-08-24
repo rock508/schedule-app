@@ -7,78 +7,92 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <div class="account-buttons">
-      <button class="logout-button" type="button">ログアウト</button>
-      <button class="login-button" type="button">ログイン</button>
-    </div>
-    <div class="status-area">
-      <button
-        id="statusButton"
-        class="status-button"
-        type="button"
-        aria-expanded="false"
-      >
-        ステータス
-      </button>
-      <section
-        id="statusPanel"
-        class="status-panel"
-        aria-label="能力一覧"
-        hidden
-      >
-        <h2>能力</h2>
-        <dl>
-          <div>
-            <dt>HP</dt>
-            <dd>1</dd>
-          </div>
-          <div>
-            <dt>攻撃</dt>
-            <dd>1</dd>
-          </div>
-          <div>
-            <dt>防御</dt>
-            <dd>1</dd>
-          </div>
-        </dl>
-      </section>
-    </div>
-    <main class="app">
-      <header class="header">
-        <nav class="month-nav" aria-label="月の移動">
-          <button id="previousMonth" type="button" aria-label="前の月">
-            ‹
-          </button>
-          <strong id="currentMonth"></strong>
-          <button id="nextMonth" type="button" aria-label="次の月">›</button>
-        </nav>
-      </header>
+    <main id="homeScreen" class="home-screen">
+      <div class="home-account-buttons">
+        <button type="button">ログイン</button>
+        <button type="button">ログアウト</button>
+      </div>
+      <button class="settings-button" type="button">設定</button>
+      <div class="home-actions">
+        <button id="startScheduleButton" type="button">スケジュール開始</button>
+        <button id="guestPlayButton" type="button">ゲストでプレイ</button>
+      </div>
+    </main>
 
-      <section class="layout">
-        <form id="eventForm" class="event-form" hidden>
-          <div class="form-heading">
-            <h2>予定を追加</h2>
-            <button id="closeForm" type="button" aria-label="フォームを閉じる">
-              ×
-            </button>
-          </div>
-          <label>予定名<input id="eventTitle" type="text" required /></label>
-          <label>日付<input id="eventDate" type="date" required /></label>
-          <label>時刻<input id="eventTime" type="time" /></label>
-          <button type="submit">追加</button>
-          <button id="deleteEvent" type="button" hidden>削除</button>
-        </form>
-
-        <section class="calendar-board" aria-label="カレンダーボード">
-          <img
-            class="calendar-board-image"
-            src="画像倉庫/カレンダーボード.png"
-            alt=""
-            aria-hidden="true"
-          />
-          <div id="calendarGrid" class="calendar-grid"></div>
+    <main id="calendarScreen" hidden>
+      <div class="status-area">
+        <button
+          id="statusButton"
+          class="status-button"
+          type="button"
+          aria-expanded="false"
+        >
+          ステータス
+        </button>
+        <section
+          id="statusPanel"
+          class="status-panel"
+          aria-label="能力一覧"
+          hidden
+        >
+          <h2>能力</h2>
+          <dl>
+            <div>
+              <dt>HP</dt>
+              <dd>1</dd>
+            </div>
+            <div>
+              <dt>攻撃</dt>
+              <dd>1</dd>
+            </div>
+            <div>
+              <dt>防御</dt>
+              <dd>1</dd>
+            </div>
+          </dl>
         </section>
-      </section>
+      </div>
+      <div class="app">
+        <header class="header">
+          <nav class="month-nav" aria-label="月の移動">
+            <button id="previousMonth" type="button" aria-label="前の月">
+              ‹
+            </button>
+            <strong id="currentMonth"></strong>
+            <button id="nextMonth" type="button" aria-label="次の月">›</button>
+          </nav>
+        </header>
+
+        <section class="layout">
+          <form id="eventForm" class="event-form" hidden>
+            <div class="form-heading">
+              <h2>予定を追加</h2>
+              <button
+                id="closeForm"
+                type="button"
+                aria-label="フォームを閉じる"
+              >
+                ×
+              </button>
+            </div>
+            <label>予定名<input id="eventTitle" type="text" required /></label>
+            <label>日付<input id="eventDate" type="date" required /></label>
+            <label>時刻<input id="eventTime" type="time" /></label>
+            <button type="submit">追加</button>
+            <button id="deleteEvent" type="button" hidden>削除</button>
+          </form>
+
+          <section class="calendar-board" aria-label="カレンダーボード">
+            <img
+              class="calendar-board-image"
+              src="画像倉庫/カレンダーボード.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <div id="calendarGrid" class="calendar-grid"></div>
+          </section>
+        </section>
+      </div>
     </main>
     <script src="script.js"></script>
   </body>
