@@ -6,12 +6,20 @@ const calendarGrid = document.querySelector("#calendarGrid");
 const currentMonth = document.querySelector("#currentMonth");
 const closeFormButton = document.querySelector("#closeForm");
 const deleteEventButton = document.querySelector("#deleteEvent");
+const statusButton = document.querySelector("#statusButton");
+const statusPanel = document.querySelector("#statusPanel");
 const today = new Date();
 const storageKey = "calendar-events";
 
 let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
 let editingEventIndex = null;
+
+statusButton.addEventListener("click", () => {
+  const isHidden = statusPanel.hidden;
+  statusPanel.hidden = !isHidden;
+  statusButton.setAttribute("aria-expanded", String(isHidden));
+});
 
 dateInput.value = formatDate(today);
 renderCalendar();
