@@ -9,10 +9,27 @@
   <body>
     <main id="homeScreen" class="home-screen">
       <div class="home-account-buttons">
-        <button type="button">ログイン</button>
-        <button type="button">ログアウト</button>
+        <button id="loginButton" type="button">ログイン</button>
+        <button id="logoutButton" type="button">ログアウト</button>
       </div>
-      <button class="settings-button" type="button">設定</button>
+      <button id="settingsButton" class="settings-button" type="button">
+        設定
+      </button>
+      <section id="loginPanel" class="home-popup login-panel" hidden>
+        <h2>ログイン</h2>
+        <label>パスワード<input id="loginPassword" type="password" /></label>
+        <button id="confirmLoginButton" type="button">ログインする</button>
+      </section>
+      <section id="settingsPanel" class="home-popup settings-panel" hidden>
+        <h2>設定</h2>
+        <label
+          >音量<input id="volumeControl" type="range" min="0" max="100"
+        /></label>
+        <label
+          >明るさ<input id="brightnessControl" type="range" min="50" max="100"
+        /></label>
+        <button id="closeSettingsButton" type="button">閉じる</button>
+      </section>
       <div class="home-actions">
         <button id="startScheduleButton" type="button">スケジュール開始</button>
         <button id="guestPlayButton" type="button">ゲストでプレイ</button>

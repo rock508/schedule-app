@@ -1,5 +1,5 @@
 :root {
-  --ink: #20242c;
+  --ink: #8d96a8;
   --muted: #68707f;
   --line: #dfe3ea;
   --background: #f7f3ed;
@@ -17,6 +17,7 @@ body {
     fixed;
   color: var(--ink);
   font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
+  filter: brightness(var(--brightness, 1));
 }
 
 [hidden] {
@@ -87,6 +88,39 @@ button {
 .home-actions button {
   font-size: 1.2rem;
   min-height: 52px;
+}
+
+.home-popup {
+  background: rgba(48, 25, 20, 0.96);
+  border: 2px solid #d2a16a;
+  box-shadow:
+    0 3px 0 #321914,
+    0 0 14px rgba(0, 0, 0, 0.5);
+  color: #ffe2ad;
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  position: absolute;
+  top: 14%;
+  width: min(320px, 80%);
+  z-index: 2;
+}
+
+.home-popup[hidden] {
+  display: none;
+}
+
+.home-popup h2 {
+  margin: 0;
+}
+
+.home-popup label {
+  display: grid;
+  gap: 6px;
+}
+
+.home-popup input {
+  width: 100%;
 }
 
 .account-buttons {
