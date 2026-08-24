@@ -12,6 +12,9 @@ const homeScreen = document.querySelector("#homeScreen");
 const calendarScreen = document.querySelector("#calendarScreen");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
+const autoBattleButton = document.querySelector("#autoBattleButton");
+const bossHpElement = document.querySelector("#bossHp");
+const battleMessage = document.querySelector("#battleMessage");
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
 const loginPanel = document.querySelector("#loginPanel");
@@ -44,10 +47,45 @@ statusButton.addEventListener("click", () => {
 function openCalendar() {
   homeScreen.hidden = true;
   calendarScreen.hidden = false;
+  loadBattleStatus();
 }
 
 startScheduleButton.addEventListener("click", openCalendar);
 guestPlayButton.addEventListener("click", openCalendar);
+
+autoBattleButton.addEventListener("click", async () => {
+  autoBattleButton.disabled = true;
+  battleMessage.textContent = "戦闘中...";
+  try {
+    const response = await fetch("/api/auto-battle", { method: "POST" });
+    const result = await response.json();
+    if (!response.ok) {
+      battleMessage.textContent = result.message;
+      return;
+    }
+    bossHpElement.textContent = `${result.bossHp} / ${result.bossMaxHp}`;
+    battleMessage.textContent = `${result.damage}ダメージを与えました。今日は戦闘終了です。`;
+  } catch {
+    battleMessage.textContent =
+      "セーブに失敗しました。もう一度お試しください。";
+    autoBattleButton.disabled = false;
+  }
+});
+
+async function loadBattleStatus() {
+  try {
+    const response = await fetch("/api/auto-battle");
+    const result = await response.json();
+    bossHpElement.textContent = `${result.bossHp} / ${result.bossMaxHp}`;
+    autoBattleButton.disabled = !result.canBattle;
+    battleMessage.textContent = result.canBattle
+      ? "今日はまだ戦えます。"
+      : "今日は戦闘済みです。明日また戦えます。";
+  } catch {
+    bossHpElement.textContent = "取得できません";
+    battleMessage.textContent = "セーブデータを取得できません。";
+  }
+}
 
 loginButton.addEventListener("click", () => {
   loginPanel.hidden = false;
