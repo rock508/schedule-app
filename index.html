@@ -59,15 +59,19 @@
           <dl>
             <div>
               <dt>HP</dt>
-              <dd>1</dd>
+              <dd id="statHp">1</dd>
             </div>
             <div>
               <dt>攻撃</dt>
-              <dd>1</dd>
+              <dd id="statAttack">1</dd>
             </div>
             <div>
               <dt>防御</dt>
-              <dd>1</dd>
+              <dd id="statDefense">1</dd>
+            </div>
+            <div>
+              <dt>すばやさ</dt>
+              <dd id="statSpeed">1</dd>
             </div>
           </dl>
         </section>
@@ -100,6 +104,7 @@
             <label>時刻<input id="eventTime" type="time" /></label>
             <button type="submit">追加</button>
             <button id="deleteEvent" type="button" hidden>削除</button>
+            <button id="completeEvent" type="button">完了</button>
           </form>
 
           <section class="calendar-board" aria-label="カレンダーボード">
