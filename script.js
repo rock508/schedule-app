@@ -1,3 +1,25 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  onAuthStateChanged,
+  signInWithPopup,
+  signOut,
+} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAlENltF3JMYRkPN9pIhxlwWh8nxK8nR7A",
+  authDomain: "suhedule-rpg.firebaseapp.com",
+  projectId: "suhedule-rpg",
+  storageBucket: "suhedule-rpg.firebasestorage.app",
+  messagingSenderId: "812350542170",
+  appId: "1:812350542170:web:8325b689720ac353ab6363",
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
 const form = document.querySelector("#eventForm");
 const titleInput = document.querySelector("#eventTitle");
 const dateInput = document.querySelector("#eventDate");
@@ -29,8 +51,9 @@ const battleMessage = document.querySelector("#battleMessage");
 const battleResetButton = document.querySelector("#battleResetButton");
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
-const loginPanel = document.querySelector("#loginPanel");
-const confirmLoginButton = document.querySelector("#confirmLoginButton");
+const userProfile = document.querySelector("#userProfile");
+const userPhoto = document.querySelector("#userPhoto");
+const userName = document.querySelector("#userName");
 const settingsButton = document.querySelector("#settingsButton");
 const settingsPanel = document.querySelector("#settingsPanel");
 const closeSettingsButton = document.querySelector("#closeSettingsButton");
@@ -38,7 +61,6 @@ const volumeControl = document.querySelector("#volumeControl");
 const brightnessControl = document.querySelector("#brightnessControl");
 const today = new Date();
 const storageKey = "calendar-events";
-const accountStorageKey = "schedule-account";
 const settingsStorageKey = "schedule-settings";
 const statsStorageKey = "schedule-stats";
 
@@ -146,20 +168,34 @@ function updateBossImage() {
   bossImage.alt = `${month}月の敵キャラ`;
 }
 
-loginButton.addEventListener("click", () => {
-  loginPanel.hidden = false;
+loginButton.addEventListener("click", async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    console.log("ログインユーザー:", result.user.displayName);
+  } catch (error) {
+    console.error("Googleログインに失敗しました:", error);
+  }
 });
 
-confirmLoginButton.addEventListener("click", () => {
-  if (!document.querySelector("#loginPassword").value) return;
-  localStorage.setItem(accountStorageKey, "logged-in");
-  loginPanel.hidden = true;
-  document.querySelector("#loginPassword").value = "";
+logoutButton.addEventListener("click", async () => {
+  try {
+    await signOut(auth);
+  } catch (error) {
+    console.error("ログアウトに失敗しました:", error);
+  }
 });
 
-logoutButton.addEventListener("click", () => {
-  localStorage.removeItem(accountStorageKey);
-  loginPanel.hidden = true;
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    userName.textContent = user.displayName || user.email || "Googleユーザー";
+    userPhoto.src = user.photoURL || "";
+    userProfile.hidden = false;
+    console.log("ログインユーザー:", user.displayName);
+    return;
+  }
+  userName.textContent = "";
+  userPhoto.removeAttribute("src");
+  userProfile.hidden = true;
 });
 
 settingsButton.addEventListener("click", () => {
