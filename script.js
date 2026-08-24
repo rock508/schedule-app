@@ -5,9 +5,7 @@ const timeInput = document.querySelector("#eventTime");
 const calendarGrid = document.querySelector("#calendarGrid");
 const currentMonth = document.querySelector("#currentMonth");
 const closeFormButton = document.querySelector("#closeForm");
-const deleteEventButton = document.querySelector("#deleteEvent");
-const statusButton = document.querySelector("#statusButton");
-const statusPanel = document.querySelector("#statusPanel");
+
 const today = new Date();
 const storageKey = "calendar-events";
 
@@ -23,6 +21,14 @@ statusButton.addEventListener("click", () => {
 
 dateInput.value = formatDate(today);
 renderCalendar();
+
+function openCalendar() {
+  homeScreen.hidden = true;
+  calendarScreen.hidden = false;
+}
+
+startScheduleButton.addEventListener("click", openCalendar);
+guestPlayButton.addEventListener("click", openCalendar);
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();

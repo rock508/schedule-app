@@ -19,6 +19,10 @@ body {
   font-family: "Segoe UI", "Hiragino Sans", "Yu Gothic UI", sans-serif;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 button,
 input {
   font: inherit;
@@ -32,6 +36,130 @@ button {
   cursor: pointer;
   min-height: 42px;
   padding: 0 16px;
+}
+
+.home-screen {
+  background: #20242c url("画像倉庫/ホーム画面.jpg") center / cover no-repeat
+    fixed;
+  min-height: 100vh;
+  position: relative;
+}
+
+.home-account-buttons,
+.settings-button {
+  position: absolute;
+  top: 5%;
+  z-index: 1;
+}
+
+.home-account-buttons {
+  display: flex;
+  gap: 12px;
+  left: 3%;
+}
+
+.settings-button {
+  right: 3%;
+}
+
+.home-account-buttons button,
+.settings-button,
+.home-actions button {
+  background: rgba(72, 34, 26, 0.9);
+  border: 2px solid #d2a16a;
+  box-shadow:
+    0 3px 0 #321914,
+    0 0 12px rgba(0, 0, 0, 0.4);
+  color: #ffe2ad;
+  font-weight: 800;
+}
+
+.home-actions {
+  bottom: 28%;
+  display: grid;
+  gap: 14px;
+  left: 50%;
+  position: absolute;
+  transform: translateX(-50%);
+  width: min(430px, 80%);
+}
+
+.home-actions button {
+  font-size: 1.2rem;
+  min-height: 52px;
+}
+
+.screen {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+.home-screen {
+  align-items: stretch;
+  justify-content: stretch;
+  background: #20242c url("画像倉庫/ホーム画面.jpg") center / cover no-repeat
+    fixed;
+  padding: 0;
+  position: relative;
+}
+
+.home-panel {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  margin: auto;
+  width: min(430px, 90%);
+}
+
+.home-panel button {
+  background: rgba(72, 34, 26, 0.9);
+  border: 3px solid #d2a16a;
+  box-shadow:
+    0 3px 0 #321914,
+    0 0 12px rgba(0, 0, 0, 0.4);
+  color: #ffe2ad;
+  font-size: 1.2rem;
+  font-weight: 800;
+  width: 100%;
+}
+
+.home-account-buttons {
+  display: flex;
+  gap: 12px;
+  left: 3%;
+  position: absolute;
+  top: 5%;
+  z-index: 1;
+}
+
+.home-account-buttons button {
+  background: rgba(72, 34, 26, 0.9);
+  border: 2px solid #d2a16a;
+  box-shadow: 0 2px 0 #321914;
+  color: #ffe2ad;
+  font-weight: 800;
+}
+
+.login-fields {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+}
+
+.login-fields[hidden] {
+  display: none;
+}
+
+.login-fields label {
+  color: white;
+  text-shadow: 0 1px 2px #000;
 }
 
 .account-buttons {
