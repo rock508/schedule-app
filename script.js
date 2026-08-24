@@ -12,12 +12,28 @@ const homeScreen = document.querySelector("#homeScreen");
 const calendarScreen = document.querySelector("#calendarScreen");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
+const loginButton = document.querySelector("#loginButton");
+const logoutButton = document.querySelector("#logoutButton");
+const loginPanel = document.querySelector("#loginPanel");
+const confirmLoginButton = document.querySelector("#confirmLoginButton");
+const settingsButton = document.querySelector("#settingsButton");
+const settingsPanel = document.querySelector("#settingsPanel");
+const closeSettingsButton = document.querySelector("#closeSettingsButton");
+const volumeControl = document.querySelector("#volumeControl");
+const brightnessControl = document.querySelector("#brightnessControl");
 const today = new Date();
 const storageKey = "calendar-events";
+const accountStorageKey = "schedule-account";
+const settingsStorageKey = "schedule-settings";
 
 let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
 let editingEventIndex = null;
+const savedSettings = loadSettings();
+
+volumeControl.value = savedSettings.volume;
+brightnessControl.value = savedSettings.brightness;
+document.body.style.setProperty("--brightness", savedSettings.brightness / 100);
 
 statusButton.addEventListener("click", () => {
   const isHidden = statusPanel.hidden;
@@ -32,6 +48,39 @@ function openCalendar() {
 
 startScheduleButton.addEventListener("click", openCalendar);
 guestPlayButton.addEventListener("click", openCalendar);
+
+loginButton.addEventListener("click", () => {
+  loginPanel.hidden = false;
+});
+
+confirmLoginButton.addEventListener("click", () => {
+  if (!document.querySelector("#loginPassword").value) return;
+  localStorage.setItem(accountStorageKey, "logged-in");
+  loginPanel.hidden = true;
+  document.querySelector("#loginPassword").value = "";
+});
+
+logoutButton.addEventListener("click", () => {
+  localStorage.removeItem(accountStorageKey);
+  loginPanel.hidden = true;
+});
+
+settingsButton.addEventListener("click", () => {
+  settingsPanel.hidden = false;
+});
+
+closeSettingsButton.addEventListener("click", () => {
+  settingsPanel.hidden = true;
+});
+
+volumeControl.addEventListener("input", saveSettings);
+brightnessControl.addEventListener("input", () => {
+  document.body.style.setProperty(
+    "--brightness",
+    brightnessControl.value / 100,
+  );
+  saveSettings();
+});
 
 dateInput.value = formatDate(today);
 renderCalendar();
@@ -208,6 +257,28 @@ function loadEvents() {
   } catch {
     return [];
   }
+}
+
+function loadSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(settingsStorageKey));
+    return {
+      volume: saved?.volume ?? 70,
+      brightness: saved?.brightness ?? 100,
+    };
+  } catch {
+    return { volume: 70, brightness: 100 };
+  }
+}
+
+function saveSettings() {
+  localStorage.setItem(
+    settingsStorageKey,
+    JSON.stringify({
+      volume: volumeControl.value,
+      brightness: brightnessControl.value,
+    }),
+  );
 }
 
 function formatDate(date) {
