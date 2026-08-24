@@ -49,6 +49,19 @@ app.post("/api/auto-battle", (req, res) => {
   });
 });
 
+app.post("/api/auto-battle/reset", (req, res) => {
+  const saveData = loadSaveData();
+  saveData.bossHp = saveData.bossMaxHp;
+  saveData.lastBattleDate = null;
+  saveSaveData(saveData);
+
+  return res.json({
+    bossHp: saveData.bossHp,
+    bossMaxHp: saveData.bossMaxHp,
+    canBattle: true,
+  });
+});
+
 function getToday() {
   const now = new Date();
   const year = now.getFullYear();

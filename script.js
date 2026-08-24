@@ -23,7 +23,10 @@ const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
 const autoBattleButton = document.querySelector("#autoBattleButton");
 const bossHpElement = document.querySelector("#bossHp");
+const bossHpBar = document.querySelector("#bossHpBar");
+const bossImage = document.querySelector("#bossImage");
 const battleMessage = document.querySelector("#battleMessage");
+const battleResetButton = document.querySelector("#battleResetButton");
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
 const loginPanel = document.querySelector("#loginPanel");
@@ -42,6 +45,7 @@ const statsStorageKey = "schedule-stats";
 let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
 let editingEventIndex = null;
+let battleDone = false;
 let stats = loadStats();
 const savedSettings = loadSettings();
 
@@ -82,7 +86,8 @@ autoBattleButton.addEventListener("click", async () => {
       battleMessage.textContent = result.message;
       return;
     }
-    bossHpElement.textContent = `${result.bossHp} / ${result.bossMaxHp}`;
+    updateBossHp(result.bossHp, result.bossMaxHp);
+    battleDone = true;
     battleMessage.textContent = `${result.damage}ダメージを与えました。今日は戦闘終了です。`;
   } catch {
     battleMessage.textContent =
@@ -95,8 +100,9 @@ async function loadBattleStatus() {
   try {
     const response = await fetch("/api/auto-battle");
     const result = await response.json();
-    bossHpElement.textContent = `${result.bossHp} / ${result.bossMaxHp}`;
-    autoBattleButton.disabled = !result.canBattle;
+    updateBossHp(result.bossHp, result.bossMaxHp);
+    battleDone = !result.canBattle;
+    autoBattleButton.disabled = battleDone;
     battleMessage.textContent = result.canBattle
       ? "今日はまだ戦えます。"
       : "今日は戦闘済みです。明日また戦えます。";
@@ -104,6 +110,40 @@ async function loadBattleStatus() {
     bossHpElement.textContent = "取得できません";
     battleMessage.textContent = "セーブデータを取得できません。";
   }
+}
+
+battleResetButton.addEventListener("click", async () => {
+  battleResetButton.disabled = true;
+  try {
+    const response = await fetch("/api/auto-battle/reset", { method: "POST" });
+    if (!response.ok) throw new Error("reset failed");
+    const result = await response.json();
+    battleDone = false;
+    updateBossHp(result.bossHp, result.bossMaxHp);
+    autoBattleButton.disabled = false;
+    battleMessage.textContent = "未戦闘・HP満タンにリセットしました。";
+  } catch {
+    battleMessage.textContent = "戦闘リセットに失敗しました。";
+  } finally {
+    battleResetButton.disabled = false;
+  }
+});
+
+function updateBossHp(bossHp, bossMaxHp) {
+  bossHpElement.textContent = `${bossHp} / ${bossMaxHp}`;
+  bossHpBar.max = bossMaxHp;
+  bossHpBar.value = bossHp;
+}
+
+function updateBossImage() {
+  const month = displayedDate.getMonth() + 1;
+  const enemyImages = {
+    8: "敵キャラ/８月.png",
+    9: "敵キャラ/９月.png",
+  };
+  const imagePath = enemyImages[month] || enemyImages[8];
+  bossImage.src = imagePath;
+  bossImage.alt = `${month}月の敵キャラ`;
 }
 
 loginButton.addEventListener("click", () => {
@@ -232,6 +272,7 @@ function renderCalendar() {
   const firstCell = new Date(year, month, 1 - firstDay.getDay());
 
   currentMonth.textContent = `${year}年${month + 1}月`;
+  updateBossImage();
   calendarGrid.replaceChildren();
 
   for (let index = 0; index < 42; index += 1) {
