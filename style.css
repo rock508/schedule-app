@@ -310,6 +310,27 @@ button {
   margin: 0 auto 10px;
   width: min(100%, 360px);
 }
+
+.boss-stats {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin: 0 0 10px;
+}
+
+.boss-stats div {
+  display: grid;
+  gap: 2px;
+}
+
+.boss-stats dt,
+.boss-stats dd {
+  margin: 0;
+}
+
+.boss-stats dd {
+  font-weight: 800;
+}
 .header {
   align-items: center;
   display: flex;

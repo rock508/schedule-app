@@ -24,6 +24,10 @@ const guestPlayButton = document.querySelector("#guestPlayButton");
 const autoBattleButton = document.querySelector("#autoBattleButton");
 const bossHpElement = document.querySelector("#bossHp");
 const bossHpBar = document.querySelector("#bossHpBar");
+const bossMonthElement = document.querySelector("#bossMonth");
+const bossAttackElement = document.querySelector("#bossAttack");
+const bossDefenseElement = document.querySelector("#bossDefense");
+const bossSpeedElement = document.querySelector("#bossSpeed");
 const bossImage = document.querySelector("#bossImage");
 const battleMessage = document.querySelector("#battleMessage");
 const battleResetButton = document.querySelector("#battleResetButton");
@@ -86,7 +90,7 @@ autoBattleButton.addEventListener("click", async () => {
       battleMessage.textContent = result.message;
       return;
     }
-    updateBossHp(result.bossHp, result.bossMaxHp);
+    updateBossStatus(result);
     battleDone = true;
     battleMessage.textContent = `${result.damage}ダメージを与えました。今日は戦闘終了です。`;
   } catch {
@@ -100,7 +104,7 @@ async function loadBattleStatus() {
   try {
     const response = await fetch("/api/auto-battle");
     const result = await response.json();
-    updateBossHp(result.bossHp, result.bossMaxHp);
+    updateBossStatus(result);
     battleDone = !result.canBattle;
     autoBattleButton.disabled = battleDone;
     battleMessage.textContent = result.canBattle
@@ -119,7 +123,7 @@ battleResetButton.addEventListener("click", async () => {
     if (!response.ok) throw new Error("reset failed");
     const result = await response.json();
     battleDone = false;
-    updateBossHp(result.bossHp, result.bossMaxHp);
+    updateBossStatus(result);
     autoBattleButton.disabled = false;
     battleMessage.textContent = "未戦闘・HP満タンにリセットしました。";
   } catch {
@@ -135,15 +139,23 @@ function updateBossHp(bossHp, bossMaxHp) {
   bossHpBar.value = bossHp;
 }
 
-function updateBossImage() {
-  const month = displayedDate.getMonth() + 1;
+function updateBossStatus(result) {
+  updateBossHp(result.bossHp, result.bossMaxHp);
+  bossMonthElement.textContent = result.bossMonth;
+  bossAttackElement.textContent = result.bossAttack;
+  bossDefenseElement.textContent = result.bossDefense;
+  bossSpeedElement.textContent = result.bossSpeed;
+  updateBossImage(result.bossMonth);
+}
+
+function updateBossImage(bossMonth = displayedDate.getMonth() + 1) {
   const enemyImages = {
     8: "敵キャラ/８月.png",
     9: "敵キャラ/９月.png",
   };
-  const imagePath = enemyImages[month] || enemyImages[8];
+  const imagePath = enemyImages[bossMonth] || enemyImages[8];
   bossImage.src = imagePath;
-  bossImage.alt = `${month}月の敵キャラ`;
+  bossImage.alt = `${bossMonth}月の敵キャラ`;
 }
 
 loginButton.addEventListener("click", () => {
