@@ -63,6 +63,14 @@ function renderCalendar() {
     const dateKey = formatDate(date);
     const cell = document.createElement("article");
     cell.className = "day";
+
+    if (date.getMonth() !== month || date.getFullYear() !== year) {
+      cell.classList.add("empty");
+      cell.setAttribute("aria-hidden", "true");
+      calendarGrid.append(cell);
+      continue;
+    }
+
     cell.tabIndex = 0;
     cell.setAttribute("role", "button");
     cell.setAttribute("aria-label", `${dateKey}の予定を追加`);
@@ -73,8 +81,14 @@ function renderCalendar() {
         openFormForDate(dateKey);
       }
     });
-    if (date.getMonth() !== month) cell.classList.add("muted");
     if (dateKey === formatDate(today)) cell.classList.add("today");
+
+    const weekday = document.createElement("div");
+    weekday.className = "weekday";
+    weekday.textContent = ["日", "月", "火", "水", "木", "金", "土"][
+      date.getDay()
+    ];
+    cell.append(weekday);
 
     const number = document.createElement("div");
     number.className = "day-number";
