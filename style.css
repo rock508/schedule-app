@@ -262,6 +262,31 @@ button {
   margin: auto;
   padding: 28px 0;
 }
+
+.battle-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin: 0 auto 18px;
+  max-width: 430px;
+  padding: 14px 18px;
+  text-align: center;
+}
+
+.battle-panel h2,
+.battle-panel p {
+  margin: 0 0 10px;
+}
+
+.battle-panel button:disabled {
+  background: #9aa1ad;
+  cursor: not-allowed;
+}
+
+#battleMessage {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
 .header {
   align-items: center;
   display: flex;
