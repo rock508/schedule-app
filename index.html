@@ -106,7 +106,22 @@
             src="敵キャラ/８月.png"
             alt="8月の敵キャラ"
           />
+          <p>第<strong id="bossMonth">1</strong>月ボス</p>
           <p>ボスHP: <strong id="bossHp">読み込み中...</strong></p>
+          <dl class="boss-stats" aria-label="ボスの能力">
+            <div>
+              <dt>攻撃</dt>
+              <dd id="bossAttack">-</dd>
+            </div>
+            <div>
+              <dt>防御</dt>
+              <dd id="bossDefense">-</dd>
+            </div>
+            <div>
+              <dt>すばやさ</dt>
+              <dd id="bossSpeed">-</dd>
+            </div>
+          </dl>
           <progress id="bossHpBar" max="1000" value="1000">
             1000 / 1000
           </progress>
