@@ -59,9 +59,12 @@ app.post("/api/auto-battle", (req, res) => {
     const bossHpBefore = bossHp;
     const playerHpBefore = playerHp;
     const damage = playerTurn
-      ? Math.min(Math.max(saveData.playerAttack, 1), bossHp)
+      ? Math.min(
+          calculateDamage(saveData.playerAttack, bossStats.defense),
+          bossHp,
+        )
       : Math.min(
-          Math.max(bossStats.attack - saveData.playerDefense, 0),
+          calculateDamage(bossStats.attack, saveData.playerDefense),
           playerHp,
         );
     if (playerTurn) {
@@ -194,6 +197,11 @@ function getBossStats(bossNumber) {
     defense: 10 + bossIndex * 4,
     speed: 5 + bossIndex * 4,
   };
+}
+
+function calculateDamage(attack, defense) {
+  const randomCorrection = 0.85 + Math.random() * 0.15;
+  return Math.max(Math.floor((attack - defense / 2) * randomCorrection), 1);
 }
 
 function advanceBoss(saveData) {
