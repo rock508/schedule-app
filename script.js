@@ -87,6 +87,7 @@ let events = loadEvents();
 let editingEventIndex = null;
 let battleDone = false;
 let battleInProgress = false;
+let currentBossNumber = 1;
 let stats = loadStats();
 const savedSettings = loadSettings();
 
@@ -247,7 +248,7 @@ function updateBossStatus(result) {
   bossAttackElement.textContent = result.bossAttack;
   bossDefenseElement.textContent = result.bossDefense;
   bossSpeedElement.textContent = result.bossSpeed;
-  updateBossImage();
+  updateBossImage(result.bossNumber);
   updatePlayerStatus(result);
 }
 
@@ -273,9 +274,15 @@ function updatePlayerStatus(gameState) {
   updatePlayerHp(gameState.playerHp, gameState.playerHp);
 }
 
-function updateBossImage() {
-  bossImage.src = "敵キャラ/８月.png";
-  bossImage.alt = "ボスの敵キャラ";
+function updateBossImage(bossNumber = currentBossNumber) {
+  currentBossNumber = bossNumber;
+  const imageNumber = ((bossNumber - 1) % 12) + 1;
+  const imageName = String(imageNumber).padStart(1, "0");
+  const fullWidthImageNumber = imageName.replace(/[0-9]/g, (digit) =>
+    String.fromCharCode(digit.charCodeAt(0) + 0xfee0),
+  );
+  bossImage.src = `敵キャラ/${fullWidthImageNumber}.png`;
+  bossImage.alt = `第${bossNumber}体目のボス`;
 }
 
 loginButton.addEventListener("click", async () => {
