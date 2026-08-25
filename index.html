@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>カレンダー</title>
-    <link rel="stylesheet" href="style.css?v=battle-hp-4" />
+    <link rel="stylesheet" href="style.css?v=boss-battle-2" />
   </head>
   <body>
     <main id="homeScreen" class="home-screen">
@@ -45,9 +45,9 @@
       <button id="backHomeButton" class="back-home-button" type="button">
         戻る
       </button>
-      <div id="levelUpEffect" class="level-up-effect" hidden aria-live="polite">
+      <div id="statUpEffect" class="stat-up-effect" hidden aria-live="polite">
         <strong>能力アップ！</strong>
-        <span>HP +1　攻撃 +1　防御 +1　すばやさ +1</span>
+        <span>HP +1　攻撃 +1　防御 +1</span>
       </div>
       <div class="status-area">
         <button
@@ -101,15 +101,6 @@
                 ＋
               </button>
             </div>
-            <div class="god-stat-row">
-              <span>すばやさ</span
-              ><button type="button" data-status="speed" data-delta="-1">
-                ー</button
-              ><strong id="godStatSpeed">1</strong
-              ><button type="button" data-status="speed" data-delta="1">
-                ＋
-              </button>
-            </div>
           </fieldset>
           <p id="godModeMessage" role="status"></p>
         </section>
@@ -122,10 +113,6 @@
           <h2>能力</h2>
           <dl>
             <div>
-              <dt>レベル</dt>
-              <dd id="statLevel">1</dd>
-            </div>
-            <div>
               <dt>HP</dt>
               <dd id="statHp">1</dd>
             </div>
@@ -136,10 +123,6 @@
             <div>
               <dt>防御</dt>
               <dd id="statDefense">1</dd>
-            </div>
-            <div>
-              <dt>すばやさ</dt>
-              <dd id="statSpeed">1</dd>
             </div>
           </dl>
         </section>
@@ -177,10 +160,6 @@
               <div>
                 <dt>防御</dt>
                 <dd id="bossDefense">-</dd>
-              </div>
-              <div>
-                <dt>すばやさ</dt>
-                <dd id="bossSpeed">-</dd>
               </div>
             </dl>
           </div>
@@ -230,6 +209,6 @@
         </section>
       </div>
     </main>
-    <script type="module" src="script.js?v=battle-hp-4"></script>
+    <script type="module" src="script.js?v=boss-battle-2"></script>
   </body>
 </html>

@@ -33,11 +33,9 @@ const levelUpEffect = document.querySelector("#levelUpEffect");
 const statusButton = document.querySelector("#statusButton");
 const statusPanel = document.querySelector("#statusPanel");
 const statElements = {
-  level: document.querySelector("#statLevel"),
   hp: document.querySelector("#statHp"),
   attack: document.querySelector("#statAttack"),
   defense: document.querySelector("#statDefense"),
-  speed: document.querySelector("#statSpeed"),
 };
 const homeScreen = document.querySelector("#homeScreen");
 const homeBgm = document.querySelector("#homeBgm");
@@ -55,7 +53,6 @@ const bossHpBar = document.querySelector("#bossHpBar");
 const bossNumberElement = document.querySelector("#bossNumber");
 const bossAttackElement = document.querySelector("#bossAttack");
 const bossDefenseElement = document.querySelector("#bossDefense");
-const bossSpeedElement = document.querySelector("#bossSpeed");
 const bossImage = document.querySelector("#bossImage");
 const battleMessage = document.querySelector("#battleMessage");
 const battleResetButton = document.querySelector("#battleResetButton");
@@ -68,7 +65,6 @@ const godStatElements = {
   hp: document.querySelector("#godStatHp"),
   attack: document.querySelector("#godStatAttack"),
   defense: document.querySelector("#godStatDefense"),
-  speed: document.querySelector("#godStatSpeed"),
 };
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
@@ -156,7 +152,7 @@ autoBattleButton.addEventListener("click", async () => {
   autoBattleButton.disabled = true;
   battleResetButton.disabled = true;
   battlePanel.classList.remove("battle-victory", "battle-defeat");
-  battleMessage.textContent = "戦闘開始。すばやさを比較しています...";
+  battleMessage.textContent = "戦闘開始。先攻で攻撃します...";
   try {
     const response = await fetch("/api/auto-battle", {
       body: JSON.stringify({}),
@@ -322,7 +318,6 @@ function updateBossStatus(result) {
   bossNumberElement.textContent = result.bossNumber;
   bossAttackElement.textContent = result.bossAttack;
   bossDefenseElement.textContent = result.bossDefense;
-  bossSpeedElement.textContent = result.bossSpeed;
   updateBossImage(result.bossNumber);
   updatePlayerStatus(result);
 }
@@ -337,7 +332,6 @@ function updateGameState(gameState) {
 }
 
 function updatePlayerStatus(gameState) {
-  statElements.level.textContent = gameState.playerLevel;
   Object.entries(godStatElements).forEach(([stat, element]) => {
     element.textContent =
       gameState[`player${stat[0].toUpperCase()}${stat.slice(1)}`];
@@ -345,7 +339,6 @@ function updatePlayerStatus(gameState) {
   statElements.hp.textContent = gameState.playerHp;
   statElements.attack.textContent = gameState.playerAttack;
   statElements.defense.textContent = gameState.playerDefense;
-  statElements.speed.textContent = gameState.playerSpeed;
   updatePlayerHp(
     gameState.playerHp,
     gameState.playerMaxHp ?? gameState.playerHp,
@@ -670,10 +663,9 @@ function loadStats() {
       hp: saved?.hp ?? 1,
       attack: saved?.attack ?? 1,
       defense: saved?.defense ?? 1,
-      speed: saved?.speed ?? 1,
     };
   } catch {
-    return { hp: 1, attack: 1, defense: 1, speed: 1 };
+    return { hp: 1, attack: 1, defense: 1 };
   }
 }
 
