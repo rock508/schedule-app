@@ -45,6 +45,8 @@ const backHomeButton = document.querySelector("#backHomeButton");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
 const autoBattleButton = document.querySelector("#autoBattleButton");
+const playerHpElement = document.querySelector("#playerHp");
+const playerHpBar = document.querySelector("#playerHpBar");
 const bossHpElement = document.querySelector("#bossHp");
 const bossHpBar = document.querySelector("#bossHpBar");
 const bossMonthElement = document.querySelector("#bossMonth");
@@ -138,6 +140,7 @@ autoBattleButton.addEventListener("click", async () => {
           ? `自分のターン！ ${turn.damage}ダメージ！`
           : `相手のターン！ ${turn.damage}ダメージ！`;
     }
+    await waitForBattleTurn();
     updateBossStatus(result);
     battleDone = true;
     battleMessage.textContent = `${result.damage}ダメージを与えました。今日は戦闘終了です。`;
@@ -224,6 +227,12 @@ function updateBossHp(bossHp, bossMaxHp) {
   bossHpBar.value = bossHp;
 }
 
+function updatePlayerHp(playerHp = stats.hp, playerMaxHp = stats.hp) {
+  playerHpElement.textContent = `${playerHp} / ${playerMaxHp}`;
+  playerHpBar.max = playerMaxHp;
+  playerHpBar.value = playerHp;
+}
+
 function updateBossStatus(result) {
   updateBossHp(result.bossHp, result.bossMaxHp);
   bossMonthElement.textContent = result.bossMonth;
@@ -247,6 +256,7 @@ function updatePlayerStatus(gameState) {
   statElements.level.textContent = gameState.playerLevel;
   statElements.attack.textContent = gameState.playerAttack;
   statElements.speed.textContent = gameState.playerSpeed;
+  updatePlayerHp(stats.hp);
 }
 
 function updateBossImage(bossMonth = displayedDate.getMonth() + 1) {

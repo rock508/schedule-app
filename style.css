@@ -371,7 +371,7 @@ button {
   font-size: 0.9rem;
 }
 
-#bossHpBar {
+.hp-bar {
   display: block;
   height: 16px;
   margin: 0 auto 10px;
