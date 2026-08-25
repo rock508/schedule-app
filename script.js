@@ -49,7 +49,7 @@ const playerHpElement = document.querySelector("#playerHp");
 const playerHpBar = document.querySelector("#playerHpBar");
 const bossHpElement = document.querySelector("#bossHp");
 const bossHpBar = document.querySelector("#bossHpBar");
-const bossMonthElement = document.querySelector("#bossMonth");
+const bossNumberElement = document.querySelector("#bossNumber");
 const bossAttackElement = document.querySelector("#bossAttack");
 const bossDefenseElement = document.querySelector("#bossDefense");
 const bossSpeedElement = document.querySelector("#bossSpeed");
@@ -60,9 +60,13 @@ const godModePanel = document.querySelector("#godModePanel");
 const advanceDayButton = document.querySelector("#advanceDayButton");
 const killBossButton = document.querySelector("#killBossButton");
 const godModeResetButton = document.querySelector("#godModeResetButton");
-const attackChangeForm = document.querySelector("#attackChangeForm");
-const attackChangeInput = document.querySelector("#attackChangeInput");
 const godModeMessage = document.querySelector("#godModeMessage");
+const godStatElements = {
+  hp: document.querySelector("#godStatHp"),
+  attack: document.querySelector("#godStatAttack"),
+  defense: document.querySelector("#godStatDefense"),
+  speed: document.querySelector("#godStatSpeed"),
+};
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
 const userProfile = document.querySelector("#userProfile");
@@ -123,7 +127,7 @@ autoBattleButton.addEventListener("click", async () => {
   battleMessage.textContent = "戦闘開始。すばやさを比較しています...";
   try {
     const response = await fetch("/api/auto-battle", {
-      body: JSON.stringify({ playerSpeed: stats.speed }),
+      body: JSON.stringify({}),
       headers: { "Content-Type": "application/json" },
       method: "POST",
     });
@@ -184,9 +188,13 @@ advanceDayButton.addEventListener("click", () =>
 );
 killBossButton.addEventListener("click", () => runGodModeAction("kill-boss"));
 godModeResetButton.addEventListener("click", () => runGodModeAction("reset"));
-attackChangeForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  runGodModeAction("change-attack", attackChangeInput.value);
+document.querySelectorAll(".god-stat-row button").forEach((button) => {
+  button.addEventListener("click", () =>
+    runGodModeAction("change-stat", {
+      status: button.dataset.status,
+      delta: Number(button.dataset.delta),
+    }),
+  );
 });
 
 async function runGodModeAction(action, value = null) {
@@ -195,7 +203,7 @@ async function runGodModeAction(action, value = null) {
     advanceDayButton,
     killBossButton,
     godModeResetButton,
-    attackChangeForm.querySelector("button"),
+    ...document.querySelectorAll(".god-stat-row button"),
   ];
   controls.forEach((control) => {
     control.disabled = true;
@@ -235,11 +243,11 @@ function updatePlayerHp(playerHp = stats.hp, playerMaxHp = stats.hp) {
 
 function updateBossStatus(result) {
   updateBossHp(result.bossHp, result.bossMaxHp);
-  bossMonthElement.textContent = result.bossMonth;
+  bossNumberElement.textContent = result.bossNumber;
   bossAttackElement.textContent = result.bossAttack;
   bossDefenseElement.textContent = result.bossDefense;
   bossSpeedElement.textContent = result.bossSpeed;
-  updateBossImage(result.bossMonth);
+  updateBossImage();
   updatePlayerStatus(result);
 }
 
@@ -254,19 +262,20 @@ function updateGameState(gameState) {
 
 function updatePlayerStatus(gameState) {
   statElements.level.textContent = gameState.playerLevel;
+  Object.entries(godStatElements).forEach(([stat, element]) => {
+    element.textContent =
+      gameState[`player${stat[0].toUpperCase()}${stat.slice(1)}`];
+  });
+  statElements.hp.textContent = gameState.playerHp;
   statElements.attack.textContent = gameState.playerAttack;
+  statElements.defense.textContent = gameState.playerDefense;
   statElements.speed.textContent = gameState.playerSpeed;
-  updatePlayerHp(stats.hp);
+  updatePlayerHp(gameState.playerHp, gameState.playerHp);
 }
 
-function updateBossImage(bossMonth = displayedDate.getMonth() + 1) {
-  const enemyImages = {
-    8: "敵キャラ/８月.png",
-    9: "敵キャラ/９月.png",
-  };
-  const imagePath = enemyImages[bossMonth] || enemyImages[8];
-  bossImage.src = imagePath;
-  bossImage.alt = `${bossMonth}月の敵キャラ`;
+function updateBossImage() {
+  bossImage.src = "敵キャラ/８月.png";
+  bossImage.alt = "ボスの敵キャラ";
 }
 
 loginButton.addEventListener("click", async () => {
@@ -364,19 +373,32 @@ deleteEventButton.addEventListener("click", () => {
   renderCalendar();
 });
 
-completeEventButton.addEventListener("click", () => {
+completeEventButton.addEventListener("click", async () => {
   if (editingEventIndex === null) return;
+  completeEventButton.disabled = true;
+  try {
+    const response = await fetch("/api/god-mode", {
+      body: JSON.stringify({ action: "complete-event" }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message);
+    updateGameState(result.gameState);
+    battleDone = !result.canBattle;
+    autoBattleButton.disabled = battleDone;
+  } catch (error) {
+    battleMessage.textContent = error.message || "予定の完了に失敗しました。";
+    completeEventButton.disabled = false;
+    return;
+  }
   events.splice(editingEventIndex, 1);
   localStorage.setItem(storageKey, JSON.stringify(events));
-  Object.keys(stats).forEach((stat) => {
-    stats[stat] += 1;
-  });
-  localStorage.setItem(statsStorageKey, JSON.stringify(stats));
-  renderStats();
   form.hidden = true;
   editingEventIndex = null;
   deleteEventButton.hidden = true;
   completeEventButton.hidden = true;
+  completeEventButton.disabled = false;
   statusPanel.hidden = false;
   statusButton.setAttribute("aria-expanded", "true");
   statusPanel.classList.remove("stats-increased");
