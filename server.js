@@ -274,10 +274,9 @@ function normalizePlayerHp(saved) {
 function normalizePlayerMaxHp(saved) {
   const savedMaxHp = Math.floor(Number(saved.playerMaxHp));
   const savedHp = Math.floor(Number(saved.playerHp));
+  const minimumMaxHp = getMinimumPlayerMaxHp(playerLevel);
   const currentHp =
-    Number.isFinite(savedHp) && savedHp >= 0
-      ? Math.max(savedHp, 1)
-      : defaultSaveData.playerMaxHp;
+    Number.isFinite(savedHp) && savedHp >= 0 ? savedHp : minimumMaxHp;
   if (!Number.isFinite(savedMaxHp) || savedMaxHp < 0) {
     return Math.max(currentHp, defaultSaveData.playerMaxHp);
   }

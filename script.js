@@ -38,6 +38,8 @@ const statElements = {
   defense: document.querySelector("#statDefense"),
 };
 const homeScreen = document.querySelector("#homeScreen");
+const homeBgm = document.querySelector("#homeBgm");
+const systemDecisionSound = document.querySelector("#systemDecisionSound");
 const calendarScreen = document.querySelector("#calendarScreen");
 const backHomeButton = document.querySelector("#backHomeButton");
 const startScheduleButton = document.querySelector("#startScheduleButton");
@@ -93,8 +95,33 @@ const battleTurnDelay = 3000;
 renderStats();
 
 volumeControl.value = savedSettings.volume;
+homeBgm.volume = savedSettings.volume / 100;
+systemDecisionSound.volume = savedSettings.volume / 100;
 brightnessControl.value = savedSettings.brightness;
 document.body.style.setProperty("--brightness", savedSettings.brightness / 100);
+
+function playSystemDecisionSound() {
+  systemDecisionSound.currentTime = 0;
+  systemDecisionSound.play().catch(() => {});
+}
+
+document.addEventListener("click", (event) => {
+  if (event.target.closest("button")) playSystemDecisionSound();
+});
+
+function playHomeBgm() {
+  homeBgm.play().catch(() => {
+    // ブラウザの自動再生制限中は、次のユーザー操作で再試行します。
+  });
+}
+
+function stopHomeBgm() {
+  homeBgm.pause();
+  homeBgm.currentTime = 0;
+}
+
+playHomeBgm();
+homeScreen.addEventListener("pointerdown", playHomeBgm, true);
 
 statusButton.addEventListener("click", () => {
   const isHidden = statusPanel.hidden;
@@ -103,6 +130,7 @@ statusButton.addEventListener("click", () => {
 });
 
 function openCalendar() {
+  stopHomeBgm();
   homeScreen.hidden = true;
   calendarScreen.hidden = false;
   loadBattleStatus();
@@ -111,6 +139,7 @@ function openCalendar() {
 function openHome() {
   calendarScreen.hidden = true;
   homeScreen.hidden = false;
+  playHomeBgm();
 }
 
 startScheduleButton.addEventListener("click", openCalendar);
@@ -369,7 +398,11 @@ closeSettingsButton.addEventListener("click", () => {
   settingsPanel.hidden = true;
 });
 
-volumeControl.addEventListener("input", saveSettings);
+volumeControl.addEventListener("input", () => {
+  homeBgm.volume = volumeControl.value / 100;
+  systemDecisionSound.volume = volumeControl.value / 100;
+  saveSettings();
+});
 brightnessControl.addEventListener("input", () => {
   document.body.style.setProperty(
     "--brightness",
