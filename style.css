@@ -391,6 +391,16 @@ button {
   object-fit: contain;
 }
 
+.battle-divider {
+  border-top: 2px solid var(--line);
+  margin: 16px 0;
+}
+
+.player-info h3 {
+  font-size: 1rem;
+  margin: 0 0 10px;
+}
+
 .battle-panel button:disabled {
   background: #9aa1ad;
   cursor: not-allowed;
