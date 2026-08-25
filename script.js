@@ -45,6 +45,7 @@ const backHomeButton = document.querySelector("#backHomeButton");
 const startScheduleButton = document.querySelector("#startScheduleButton");
 const guestPlayButton = document.querySelector("#guestPlayButton");
 const autoBattleButton = document.querySelector("#autoBattleButton");
+const battlePanel = document.querySelector(".battle-panel");
 const playerHpElement = document.querySelector("#playerHp");
 const playerHpBar = document.querySelector("#playerHpBar");
 const bossHpElement = document.querySelector("#bossHp");
@@ -125,6 +126,7 @@ autoBattleButton.addEventListener("click", async () => {
   battleInProgress = true;
   autoBattleButton.disabled = true;
   battleResetButton.disabled = true;
+  battlePanel.classList.remove("battle-victory", "battle-defeat");
   battleMessage.textContent = "戦闘開始。すばやさを比較しています...";
   try {
     const response = await fetch("/api/auto-battle", {
@@ -137,18 +139,25 @@ autoBattleButton.addEventListener("click", async () => {
       battleMessage.textContent = result.message;
       return;
     }
+    const battleState = createBattleState(result);
+    updateBossHp(battleState.bossHp, battleState.bossMaxHp);
+    updatePlayerHp(battleState.playerHp, battleState.playerMaxHp);
     for (const [index, turn] of result.turns.entries()) {
       if (index > 0) await waitForBattleTurn();
-      updateBossHp(turn.bossHp, result.bossMaxHp);
-      battleMessage.textContent =
-        turn.actor === "player"
-          ? `自分のターン！ ${turn.damage}ダメージ！`
-          : `相手のターン！ ${turn.damage}ダメージ！`;
+      applyBattleTurn(turn, battleState);
+      battleMessage.textContent = getBattleTurnMessage(turn);
     }
     await waitForBattleTurn();
-    updateBossStatus(result);
+    updateBossHp(result.battleBossHp ?? battleState.bossHp, battleState.bossMaxHp);
+    updatePlayerHp(result.playerHp ?? battleState.playerHp, battleState.playerMaxHp);
     battleDone = true;
-    battleMessage.textContent = `${result.damage}ダメージを与えました。今日は戦闘終了です。`;
+    battlePanel.classList.add(
+      result.outcome === "victory" ? "battle-victory" : "battle-defeat",
+    );
+    battleMessage.textContent =
+      result.outcome === "victory"
+        ? `勝利！ ${result.damage}ダメージを与えました。`
+        : "敗北... 自分のHPが0になりました。今日は戦闘終了です。";
   } catch {
     battleMessage.textContent =
       "セーブに失敗しました。もう一度お試しください。";
@@ -163,8 +172,38 @@ function waitForBattleTurn() {
   return new Promise((resolve) => setTimeout(resolve, battleTurnDelay));
 }
 
+function createBattleState(result) {
+  return {
+    bossHp: result.initialBossHp ?? result.bossHp ?? 0,
+    bossMaxHp: result.battleBossMaxHp ?? result.bossMaxHp ?? 1,
+    playerHp: result.initialPlayerHp ?? result.playerHp ?? 0,
+    playerMaxHp: result.playerMaxHp ?? result.initialPlayerHp ?? result.playerHp ?? 1,
+  };
+}
+
+function applyBattleTurn(turn, battleState) {
+  if (turn.target === "boss" || turn.actor === "player") {
+    battleState.bossHp = turn.bossHp ?? battleState.bossHp;
+  } else {
+    battleState.playerHp = turn.playerHp ?? battleState.playerHp;
+  }
+  updateBossHp(battleState.bossHp, battleState.bossMaxHp);
+  updatePlayerHp(battleState.playerHp, battleState.playerMaxHp);
+}
+
+function getBattleTurnMessage(turn) {
+  if (turn.target === "boss") {
+    return `自分の攻撃！ 相手に${turn.damage}ダメージ！`;
+  }
+  if (turn.damage === 0) {
+    return "相手の攻撃！ 防御してダメージを受けませんでした。";
+  }
+  return `相手の攻撃！ 自分が${turn.damage}ダメージを受けました。`;
+}
+
 async function loadBattleStatus() {
   try {
+    battlePanel.classList.remove("battle-victory", "battle-defeat");
     const response = await fetch("/api/auto-battle");
     const result = await response.json();
     updateBossStatus(result);
@@ -271,7 +310,10 @@ function updatePlayerStatus(gameState) {
   statElements.attack.textContent = gameState.playerAttack;
   statElements.defense.textContent = gameState.playerDefense;
   statElements.speed.textContent = gameState.playerSpeed;
-  updatePlayerHp(gameState.playerHp, gameState.playerHp);
+  updatePlayerHp(
+    gameState.playerHp,
+    gameState.playerMaxHp ?? gameState.playerHp,
+  );
 }
 
 function updateBossImage(bossNumber = currentBossNumber) {

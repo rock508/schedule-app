@@ -12,7 +12,8 @@ const defaultSaveData = {
   lastBattleDate: null,
   currentDate: null,
   playerLevel: 1,
-  playerHp: 1,
+  playerHp: 20,
+  playerMaxHp: 20,
   playerAttack: 1,
   playerDefense: 1,
   playerSpeed: 1,
@@ -48,35 +49,60 @@ app.post("/api/auto-battle", (req, res) => {
   const bossStats = getBossStats(saveData.bossNumber);
   const turns = [];
   let bossHp = saveData.bossHp;
+  let playerHp = saveData.playerHp;
+  const initialBossHp = bossHp;
+  const initialPlayerHp = playerHp;
+  const playerMaxHp = saveData.playerMaxHp;
   let playerTurn = saveData.playerSpeed > bossStats.speed;
 
-  while (bossHp > 0) {
+  while (bossHp > 0 && playerHp > 0) {
+    const bossHpBefore = bossHp;
+    const playerHpBefore = playerHp;
     const damage = playerTurn
       ? Math.min(Math.max(saveData.playerAttack, 1), bossHp)
-      : Math.max(bossStats.attack - saveData.playerDefense, 0);
-    if (playerTurn) bossHp -= damage;
+      : Math.min(
+          Math.max(bossStats.attack - saveData.playerDefense, 0),
+          playerHp,
+        );
+    if (playerTurn) {
+      bossHp -= damage;
+    } else {
+      playerHp = Math.max(playerHp - damage, 0);
+    }
     turns.push({
       actor: playerTurn ? "player" : "boss",
+      target: playerTurn ? "boss" : "player",
       damage,
+      bossHpBefore,
       bossHp,
+      playerHpBefore,
+      playerHp,
     });
     playerTurn = !playerTurn;
   }
 
   saveData.bossHp = bossHp;
+  saveData.playerHp = playerHp;
   const damage = turns
     .filter((turn) => turn.actor === "player")
     .reduce((total, turn) => total + turn.damage, 0);
-  if (saveData.bossHp === 0) {
+  const outcome = bossHp === 0 ? "victory" : "defeat";
+  if (outcome === "victory") {
     advanceBoss(saveData);
   }
   saveData.lastBattleDate = saveData.currentDate;
   saveSaveData(saveData);
 
   return res.json({
+    ...getGameState(saveData),
     damage,
     turns,
-    ...getGameState(saveData),
+    outcome,
+    initialBossHp,
+    initialPlayerHp,
+    playerMaxHp,
+    battleBossHp: bossHp,
+    battleBossMaxHp: bossStats.hp,
     canBattle: false,
   });
 });
@@ -86,7 +112,8 @@ app.post("/api/auto-battle/reset", (req, res) => {
   saveData.bossHp = saveData.bossMaxHp;
   saveData.lastBattleDate = null;
   saveData.playerLevel = 1;
-  saveData.playerHp = 1;
+  saveData.playerHp = defaultSaveData.playerHp;
+  saveData.playerMaxHp = defaultSaveData.playerMaxHp;
   saveData.playerAttack = 1;
   saveData.playerDefense = 1;
   saveSaveData(saveData);
@@ -107,7 +134,8 @@ app.post("/api/god-mode", (req, res) => {
     saveData.bossHp = saveData.bossMaxHp;
     saveData.lastBattleDate = null;
     saveData.playerLevel = 1;
-    saveData.playerHp = 1;
+    saveData.playerHp = defaultSaveData.playerHp;
+    saveData.playerMaxHp = defaultSaveData.playerMaxHp;
     saveData.playerAttack = 1;
     saveData.playerDefense = 1;
     saveData.playerSpeed = 1;
@@ -124,10 +152,10 @@ app.post("/api/god-mode", (req, res) => {
   } else if (action === "complete-event") {
     saveData.playerLevel += 1;
     saveData.playerHp += 1;
+    saveData.playerMaxHp += 1;
     saveData.playerAttack += 1;
     saveData.playerDefense += 1;
     saveData.playerSpeed += 1;
-    advanceBoss(saveData);
   } else {
     return res.status(400).json({ message: "不明な神の手アクションです。" });
   }
@@ -151,6 +179,7 @@ function getGameState(saveData) {
     currentDate: saveData.currentDate,
     playerLevel: saveData.playerLevel,
     playerHp: saveData.playerHp,
+    playerMaxHp: saveData.playerMaxHp,
     playerAttack: saveData.playerAttack,
     playerDefense: saveData.playerDefense,
     playerSpeed: saveData.playerSpeed,
@@ -161,9 +190,9 @@ function getBossStats(bossNumber) {
   const bossIndex = bossNumber - 1;
   return {
     hp: Math.round(200 * 1.5 ** bossIndex),
-    attack: 10 + bossIndex * 40,
-    defense: 10 + bossIndex * 40,
-    speed: 5 + bossIndex * 40,
+    attack: 10 + bossIndex * 4,
+    defense: 10 + bossIndex * 4,
+    speed: 5 + bossIndex * 4,
   };
 }
 
@@ -198,9 +227,14 @@ function formatDate(date) {
 function loadSaveData() {
   try {
     const saved = JSON.parse(fs.readFileSync(saveFile, "utf8"));
-    const bossNumber = Number(saved.bossNumber ?? saved.bossMonth);
+    const savedBossNumber = Number(saved.bossNumber ?? saved.bossMonth);
+    const playerLevel =
+      Number.isInteger(saved.playerLevel) && saved.playerLevel >= 1
+        ? saved.playerLevel
+        : 1;
+    const bossNumber = normalizeBossNumber(savedBossNumber, playerLevel);
     if (!Number.isInteger(bossNumber) || bossNumber < 1) {
-      return { ...defaultSaveData };
+      return createDefaultSaveData();
     }
     const bossStats = getBossStats(bossNumber);
     const savedBossHp = Number(saved.bossHp);
@@ -209,14 +243,9 @@ function loadSaveData() {
       ...saved,
       bossNumber,
       currentDate: saved.currentDate || getToday(),
-      playerLevel:
-        Number.isInteger(saved.playerLevel) && saved.playerLevel >= 1
-          ? saved.playerLevel
-          : 1,
-      playerHp:
-        Number.isFinite(Number(saved.playerHp)) && Number(saved.playerHp) >= 0
-          ? Math.floor(Number(saved.playerHp))
-          : 1,
+      playerLevel,
+      playerHp: normalizePlayerHp(saved, playerLevel),
+      playerMaxHp: normalizePlayerMaxHp(saved, playerLevel),
       playerAttack:
         Number.isFinite(Number(saved.playerAttack)) &&
         Number(saved.playerAttack) >= 0
@@ -239,8 +268,49 @@ function loadSaveData() {
       ),
     };
   } catch {
-    return { ...defaultSaveData };
+    return createDefaultSaveData();
   }
+}
+
+function normalizeBossNumber(bossNumber, playerLevel) {
+  if (!Number.isInteger(bossNumber) || bossNumber < 1) {
+    return bossNumber;
+  }
+  return Math.min(bossNumber, Math.max(playerLevel, 1));
+}
+
+function normalizePlayerHp(saved, playerLevel) {
+  const savedHp = Math.floor(Number(saved.playerHp));
+  if (!Number.isFinite(savedHp) || savedHp < 0) {
+    return getMinimumPlayerMaxHp(playerLevel);
+  }
+  return Math.max(savedHp, getMinimumPlayerHp(playerLevel));
+}
+
+function normalizePlayerMaxHp(saved, playerLevel) {
+  const savedMaxHp = Math.floor(Number(saved.playerMaxHp));
+  const savedHp = Math.floor(Number(saved.playerHp));
+  const minimumMaxHp = getMinimumPlayerMaxHp(playerLevel);
+  const currentHp = Number.isFinite(savedHp) && savedHp >= 0 ? savedHp : minimumMaxHp;
+  if (!Number.isFinite(savedMaxHp) || savedMaxHp < 0) {
+    return Math.max(currentHp, minimumMaxHp);
+  }
+  return Math.max(savedMaxHp, currentHp, minimumMaxHp);
+}
+
+function getMinimumPlayerHp(playerLevel) {
+  return Math.max(1, getMinimumPlayerMaxHp(playerLevel));
+}
+
+function getMinimumPlayerMaxHp(playerLevel) {
+  return defaultSaveData.playerMaxHp + Math.max(playerLevel - 1, 0);
+}
+
+function createDefaultSaveData() {
+  return {
+    ...defaultSaveData,
+    currentDate: getToday(),
+  };
 }
 
 function saveSaveData(saveData) {
