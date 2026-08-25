@@ -102,6 +102,8 @@ app.post("/api/god-mode", (req, res) => {
   } else if (action === "kill-boss") {
     advanceBoss(saveData);
   } else if (action === "reset") {
+    saveData.bossNumber = defaultSaveData.bossNumber;
+    saveData.bossMaxHp = getBossStats(saveData.bossNumber).hp;
     saveData.bossHp = saveData.bossMaxHp;
     saveData.lastBattleDate = null;
     saveData.playerLevel = 1;
