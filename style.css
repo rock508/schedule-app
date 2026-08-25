@@ -290,6 +290,36 @@ button {
   margin: 0;
 }
 
+.god-stats-form {
+  border: 1px solid rgba(255, 226, 173, 0.5);
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 8px;
+}
+
+.god-stats-form legend {
+  font-weight: 800;
+  padding: 0 4px;
+}
+
+.god-stat-row {
+  align-items: center;
+  display: grid;
+  gap: 5px;
+  grid-template-columns: 1fr 28px 28px 28px;
+}
+
+.god-stat-row button {
+  font-size: 0.85rem;
+  min-height: 28px;
+  padding: 0;
+}
+
+.god-stat-row strong {
+  text-align: center;
+}
+
 .status-panel {
   background: rgba(255, 255, 255, 0.96);
   border: 2px solid #20242c;

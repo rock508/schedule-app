@@ -69,17 +69,42 @@
           <button id="advanceDayButton" type="button">翌日に移動</button>
           <button id="killBossButton" type="button">ボスをKILL</button>
           <button id="godModeResetButton" type="button">戦闘リセット</button>
-          <form id="attackChangeForm">
-            <label
-              >攻撃力変更<input
-                id="attackChangeInput"
-                type="number"
-                min="0"
-                step="1"
-                required
-            /></label>
-            <button type="submit">決定</button>
-          </form>
+          <fieldset class="god-stats-form">
+            <legend>ステータス変更</legend>
+            <div class="god-stat-row">
+              <span>HP</span
+              ><button type="button" data-status="hp" data-delta="-1">ー</button
+              ><strong id="godStatHp">1</strong
+              ><button type="button" data-status="hp" data-delta="1">＋</button>
+            </div>
+            <div class="god-stat-row">
+              <span>攻撃</span
+              ><button type="button" data-status="attack" data-delta="-1">
+                ー</button
+              ><strong id="godStatAttack">1</strong
+              ><button type="button" data-status="attack" data-delta="1">
+                ＋
+              </button>
+            </div>
+            <div class="god-stat-row">
+              <span>防御</span
+              ><button type="button" data-status="defense" data-delta="-1">
+                ー</button
+              ><strong id="godStatDefense">1</strong
+              ><button type="button" data-status="defense" data-delta="1">
+                ＋
+              </button>
+            </div>
+            <div class="god-stat-row">
+              <span>すばやさ</span
+              ><button type="button" data-status="speed" data-delta="-1">
+                ー</button
+              ><strong id="godStatSpeed">1</strong
+              ><button type="button" data-status="speed" data-delta="1">
+                ＋
+              </button>
+            </div>
+          </fieldset>
           <p id="godModeMessage" role="status"></p>
         </section>
         <section
@@ -132,7 +157,7 @@
             src="敵キャラ/８月.png"
             alt="8月の敵キャラ"
           />
-          <p>第<strong id="bossMonth">1</strong>月ボス</p>
+          <p>第<strong id="bossNumber">1</strong>体目のボス</p>
           <p>自分HP: <strong id="playerHp">読み込み中...</strong></p>
           <progress id="playerHpBar" class="hp-bar" max="1" value="1">
             1 / 1
