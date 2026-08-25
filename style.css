@@ -249,6 +249,47 @@ button {
   margin-left: 8px;
 }
 
+.god-mode-panel {
+  background: rgba(48, 25, 20, 0.97);
+  border: 2px solid #d2a16a;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+  color: #ffe2ad;
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 12px;
+  position: absolute;
+  right: 0;
+  width: 220px;
+}
+
+.god-mode-panel h2 {
+  margin: 0 0 2px;
+}
+
+.god-mode-panel button {
+  min-height: 36px;
+  padding: 0 10px;
+}
+
+.god-mode-panel form {
+  display: grid;
+  gap: 8px;
+}
+
+.god-mode-panel label {
+  color: #ffe2ad;
+}
+
+.god-mode-panel input {
+  min-height: 36px;
+}
+
+#godModeMessage {
+  font-size: 0.8rem;
+  margin: 0;
+}
+
 .status-panel {
   background: rgba(255, 255, 255, 0.96);
   border: 2px solid #20242c;
