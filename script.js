@@ -78,7 +78,8 @@ const userName = document.querySelector("#userName");
 const settingsButton = document.querySelector("#settingsButton");
 const settingsPanel = document.querySelector("#settingsPanel");
 const closeSettingsButton = document.querySelector("#closeSettingsButton");
-const volumeControl = document.querySelector("#volumeControl");
+const bgmVolumeControl = document.querySelector("#bgmVolumeControl");
+const systemVolumeControl = document.querySelector("#systemVolumeControl");
 const brightnessControl = document.querySelector("#brightnessControl");
 const today = new Date();
 const storageKey = "calendar-events";
@@ -98,9 +99,10 @@ const battleTurnDelay = 3000;
 
 renderStats();
 
-volumeControl.value = savedSettings.volume;
-homeBgm.volume = savedSettings.volume / 100;
-systemDecisionSound.volume = savedSettings.volume / 100;
+bgmVolumeControl.value = savedSettings.bgmVolume;
+systemVolumeControl.value = savedSettings.systemVolume;
+homeBgm.volume = savedSettings.bgmVolume / 100;
+systemDecisionSound.volume = savedSettings.systemVolume / 100;
 brightnessControl.value = savedSettings.brightness;
 document.body.style.setProperty("--brightness", savedSettings.brightness / 100);
 
@@ -109,8 +111,21 @@ function playSystemDecisionSound() {
   systemDecisionSound.play().catch(() => {});
 }
 
-document.addEventListener("click", (event) => {
-  if (event.target.closest("button")) playSystemDecisionSound();
+document.addEventListener(
+  "pointerdown",
+  (event) => {
+    if (event.target.closest("button")) playSystemDecisionSound();
+  },
+  true,
+);
+
+document.addEventListener("keydown", (event) => {
+  if (
+    (event.key === "Enter" || event.key === " ") &&
+    event.target.closest("button")
+  ) {
+    playSystemDecisionSound();
+  }
 });
 
 function playHomeBgm() {
@@ -405,9 +420,12 @@ closeSettingsButton.addEventListener("click", () => {
   settingsPanel.hidden = true;
 });
 
-volumeControl.addEventListener("input", () => {
-  homeBgm.volume = volumeControl.value / 100;
-  systemDecisionSound.volume = volumeControl.value / 100;
+bgmVolumeControl.addEventListener("input", () => {
+  homeBgm.volume = bgmVolumeControl.value / 100;
+  saveSettings();
+});
+systemVolumeControl.addEventListener("input", () => {
+  systemDecisionSound.volume = systemVolumeControl.value / 100;
   saveSettings();
 });
 brightnessControl.addEventListener("input", () => {
@@ -654,12 +672,14 @@ function loadEvents() {
 function loadSettings() {
   try {
     const saved = JSON.parse(localStorage.getItem(settingsStorageKey));
+    const legacyVolume = saved?.volume ?? 70;
     return {
-      volume: saved?.volume ?? 70,
+      bgmVolume: saved?.bgmVolume ?? legacyVolume,
+      systemVolume: saved?.systemVolume ?? legacyVolume,
       brightness: saved?.brightness ?? 100,
     };
   } catch {
-    return { volume: 70, brightness: 100 };
+    return { bgmVolume: 70, systemVolume: 70, brightness: 100 };
   }
 }
 
@@ -681,7 +701,8 @@ function saveSettings() {
   localStorage.setItem(
     settingsStorageKey,
     JSON.stringify({
-      volume: volumeControl.value,
+      bgmVolume: bgmVolumeControl.value,
+      systemVolume: systemVolumeControl.value,
       brightness: brightnessControl.value,
     }),
   );
