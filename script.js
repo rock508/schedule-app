@@ -80,8 +80,11 @@ let displayedDate = new Date(today.getFullYear(), today.getMonth(), 1);
 let events = loadEvents();
 let editingEventIndex = null;
 let battleDone = false;
+let battleInProgress = false;
 let stats = loadStats();
 const savedSettings = loadSettings();
+
+const battleTurnDelay = 3000;
 
 renderStats();
 
@@ -111,14 +114,29 @@ guestPlayButton.addEventListener("click", openCalendar);
 backHomeButton.addEventListener("click", openHome);
 
 autoBattleButton.addEventListener("click", async () => {
+  if (battleInProgress) return;
+  battleInProgress = true;
   autoBattleButton.disabled = true;
-  battleMessage.textContent = "戦闘中...";
+  battleResetButton.disabled = true;
+  battleMessage.textContent = "戦闘開始。すばやさを比較しています...";
   try {
-    const response = await fetch("/api/auto-battle", { method: "POST" });
+    const response = await fetch("/api/auto-battle", {
+      body: JSON.stringify({ playerSpeed: stats.speed }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
     const result = await response.json();
     if (!response.ok) {
       battleMessage.textContent = result.message;
       return;
+    }
+    for (const [index, turn] of result.turns.entries()) {
+      if (index > 0) await waitForBattleTurn();
+      updateBossHp(turn.bossHp, result.bossMaxHp);
+      battleMessage.textContent =
+        turn.actor === "player"
+          ? `自分のターン！ ${turn.damage}ダメージ！`
+          : `相手のターン！ ${turn.damage}ダメージ！`;
     }
     updateBossStatus(result);
     battleDone = true;
@@ -126,9 +144,16 @@ autoBattleButton.addEventListener("click", async () => {
   } catch {
     battleMessage.textContent =
       "セーブに失敗しました。もう一度お試しください。";
-    autoBattleButton.disabled = false;
+  } finally {
+    battleInProgress = false;
+    autoBattleButton.disabled = battleDone;
+    battleResetButton.disabled = false;
   }
 });
+
+function waitForBattleTurn() {
+  return new Promise((resolve) => setTimeout(resolve, battleTurnDelay));
+}
 
 async function loadBattleStatus() {
   try {
@@ -147,6 +172,7 @@ async function loadBattleStatus() {
 }
 
 battleResetButton.addEventListener("click", async () => {
+  if (battleInProgress) return;
   godModePanel.hidden = !godModePanel.hidden;
 });
 
@@ -220,6 +246,7 @@ function updateGameState(gameState) {
 function updatePlayerStatus(gameState) {
   statElements.level.textContent = gameState.playerLevel;
   statElements.attack.textContent = gameState.playerAttack;
+  statElements.speed.textContent = gameState.playerSpeed;
 }
 
 function updateBossImage(bossMonth = displayedDate.getMonth() + 1) {

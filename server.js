@@ -13,6 +13,7 @@ const defaultSaveData = {
   currentDate: null,
   playerLevel: 1,
   playerAttack: 1,
+  playerSpeed: 1,
 };
 
 app.use(express.json());
@@ -38,18 +39,45 @@ app.post("/api/auto-battle", (req, res) => {
     });
   }
 
-  const damage = Math.min(100, saveData.bossHp);
-  saveData.bossHp -= damage;
+  const requestedPlayerSpeed = Number(req.body?.playerSpeed);
+  if (Number.isFinite(requestedPlayerSpeed) && requestedPlayerSpeed >= 0) {
+    saveData.playerSpeed = Math.floor(requestedPlayerSpeed);
+  }
+  const bossStats = getBossStats(saveData.bossMonth);
+  const turns = [];
+  let bossHp = saveData.bossHp;
+  let playerTurn = saveData.playerSpeed > bossStats.speed;
+
+  while (bossHp > 0) {
+    const damage = playerTurn ? Math.min(100, bossHp) : bossStats.attack;
+    if (playerTurn) bossHp -= damage;
+    turns.push({
+      actor: playerTurn ? "player" : "boss",
+      damage,
+      bossHp,
+    });
+    playerTurn = !playerTurn;
+  }
+
+  saveData.bossHp = bossHp;
+  const damage = turns
+    .filter((turn) => turn.actor === "player")
+    .reduce((total, turn) => total + turn.damage, 0);
   if (saveData.bossHp === 0) {
     saveData.bossMonth += 1;
     const nextBossStats = getBossStats(saveData.bossMonth);
     saveData.bossMaxHp = nextBossStats.hp;
     saveData.bossHp = nextBossStats.hp;
   }
-  saveData.lastBattleDate = today;
+  saveData.lastBattleDate = saveData.currentDate;
   saveSaveData(saveData);
 
-  return res.json({ damage, ...getGameState(saveData), canBattle: false });
+  return res.json({
+    damage,
+    turns,
+    ...getGameState(saveData),
+    canBattle: false,
+  });
 });
 
 app.post("/api/auto-battle/reset", (req, res) => {
@@ -106,6 +134,7 @@ function getGameState(saveData) {
     currentDate: saveData.currentDate,
     playerLevel: saveData.playerLevel,
     playerAttack: saveData.playerAttack,
+    playerSpeed: saveData.playerSpeed,
   };
 }
 
@@ -160,6 +189,11 @@ function loadSaveData() {
         Number.isFinite(Number(saved.playerAttack)) &&
         Number(saved.playerAttack) >= 0
           ? Math.floor(Number(saved.playerAttack))
+          : 1,
+      playerSpeed:
+        Number.isFinite(Number(saved.playerSpeed)) &&
+        Number(saved.playerSpeed) >= 0
+          ? Math.floor(Number(saved.playerSpeed))
           : 1,
       bossMaxHp: bossStats.hp,
       bossHp: Math.min(
