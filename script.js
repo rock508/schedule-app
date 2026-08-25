@@ -150,7 +150,9 @@ battleResetButton.addEventListener("click", async () => {
   godModePanel.hidden = !godModePanel.hidden;
 });
 
-advanceDayButton.addEventListener("click", () => runGodModeAction("advance-day"));
+advanceDayButton.addEventListener("click", () =>
+  runGodModeAction("advance-day"),
+);
 killBossButton.addEventListener("click", () => runGodModeAction("kill-boss"));
 godModeResetButton.addEventListener("click", () => runGodModeAction("reset"));
 attackChangeForm.addEventListener("submit", (event) => {

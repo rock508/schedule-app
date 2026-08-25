@@ -20,7 +20,10 @@ app.use(express.static(__dirname));
 
 app.get("/api/auto-battle", (req, res) => {
   const saveData = loadSaveData();
-  res.json({ ...getGameState(saveData), canBattle: saveData.lastBattleDate !== saveData.currentDate });
+  res.json({
+    ...getGameState(saveData),
+    canBattle: saveData.lastBattleDate !== saveData.currentDate,
+  });
 });
 
 app.post("/api/auto-battle", (req, res) => {
@@ -75,7 +78,9 @@ app.post("/api/god-mode", (req, res) => {
   } else if (action === "change-attack") {
     const attack = Number(value);
     if (!Number.isFinite(attack) || attack < 0) {
-      return res.status(400).json({ message: "攻撃力には0以上の数値を入力してください。" });
+      return res
+        .status(400)
+        .json({ message: "攻撃力には0以上の数値を入力してください。" });
     }
     saveData.playerAttack = Math.floor(attack);
   } else {
@@ -147,12 +152,15 @@ function loadSaveData() {
       ...defaultSaveData,
       ...saved,
       currentDate: saved.currentDate || getToday(),
-      playerLevel: Number.isInteger(saved.playerLevel) && saved.playerLevel >= 1
-        ? saved.playerLevel
-        : 1,
-      playerAttack: Number.isFinite(Number(saved.playerAttack)) && Number(saved.playerAttack) >= 0
-        ? Math.floor(Number(saved.playerAttack))
-        : 1,
+      playerLevel:
+        Number.isInteger(saved.playerLevel) && saved.playerLevel >= 1
+          ? saved.playerLevel
+          : 1,
+      playerAttack:
+        Number.isFinite(Number(saved.playerAttack)) &&
+        Number(saved.playerAttack) >= 0
+          ? Math.floor(Number(saved.playerAttack))
+          : 1,
       bossMaxHp: bossStats.hp,
       bossHp: Math.min(
         Math.max(Number.isFinite(savedBossHp) ? savedBossHp : bossStats.hp, 0),
