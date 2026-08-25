@@ -185,7 +185,7 @@ button {
   z-index: 10;
 }
 
-.level-up-effect {
+.stat-up-effect {
   align-items: center;
   background: rgba(20, 16, 10, 0.92);
   border: 4px solid #ffd74a;
@@ -207,24 +207,24 @@ button {
   z-index: 20;
 }
 
-.level-up-effect strong {
+.stat-up-effect strong {
   color: #ffd74a;
   font-size: clamp(2rem, 6vw, 4rem);
   text-shadow: 0 2px 8px rgba(255, 196, 0, 0.75);
   white-space: nowrap;
 }
 
-.level-up-effect span {
+.stat-up-effect span {
   font-size: clamp(1rem, 2.5vw, 1.5rem);
   font-weight: 800;
   white-space: nowrap;
 }
 
-.level-up-show {
-  animation: level-up-show 1.8s ease forwards;
+.stat-up-show {
+  animation: stat-up-show 1.8s ease forwards;
 }
 
-@keyframes level-up-show {
+@keyframes stat-up-show {
   0% {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.7);
