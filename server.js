@@ -10,6 +10,9 @@ const defaultSaveData = {
   bossMaxHp: 200,
   bossHp: 200,
   lastBattleDate: null,
+  currentDate: null,
+  playerLevel: 1,
+  playerAttack: 1,
 };
 
 app.use(express.json());
@@ -17,27 +20,17 @@ app.use(express.static(__dirname));
 
 app.get("/api/auto-battle", (req, res) => {
   const saveData = loadSaveData();
-  const bossStats = getBossStats(saveData.bossMonth);
-  res.json({
-    bossHp: saveData.bossHp,
-    bossMaxHp: saveData.bossMaxHp,
-    bossMonth: saveData.bossMonth,
-    bossAttack: bossStats.attack,
-    bossDefense: bossStats.defense,
-    bossSpeed: bossStats.speed,
-    canBattle: saveData.lastBattleDate !== getToday(),
-  });
+  res.json({ ...getGameState(saveData), canBattle: saveData.lastBattleDate !== saveData.currentDate });
 });
 
 app.post("/api/auto-battle", (req, res) => {
   const saveData = loadSaveData();
-  const today = getToday();
+  const today = saveData.currentDate;
 
   if (saveData.lastBattleDate === today) {
     return res.status(409).json({
       message: "オートバトルは今日はもう使えません。",
-      bossHp: saveData.bossHp,
-      bossMaxHp: saveData.bossMaxHp,
+      ...getGameState(saveData),
       canBattle: false,
     });
   }
@@ -53,36 +46,63 @@ app.post("/api/auto-battle", (req, res) => {
   saveData.lastBattleDate = today;
   saveSaveData(saveData);
 
-  const bossStats = getBossStats(saveData.bossMonth);
-  return res.json({
-    damage,
-    bossHp: saveData.bossHp,
-    bossMaxHp: saveData.bossMaxHp,
-    bossMonth: saveData.bossMonth,
-    bossAttack: bossStats.attack,
-    bossDefense: bossStats.defense,
-    bossSpeed: bossStats.speed,
-    canBattle: false,
-  });
+  return res.json({ damage, ...getGameState(saveData), canBattle: false });
 });
 
 app.post("/api/auto-battle/reset", (req, res) => {
   const saveData = loadSaveData();
   saveData.bossHp = saveData.bossMaxHp;
   saveData.lastBattleDate = null;
+  saveData.playerLevel = 1;
+  saveData.playerAttack = 1;
   saveSaveData(saveData);
-  const bossStats = getBossStats(saveData.bossMonth);
+  return res.json({ ...getGameState(saveData), canBattle: true });
+});
 
+app.post("/api/god-mode", (req, res) => {
+  const saveData = loadSaveData();
+  const { action, value } = req.body || {};
+
+  if (action === "advance-day") {
+    saveData.currentDate = addDays(saveData.currentDate, 1);
+  } else if (action === "kill-boss") {
+    saveData.bossHp = 0;
+  } else if (action === "reset") {
+    saveData.bossHp = saveData.bossMaxHp;
+    saveData.lastBattleDate = null;
+    saveData.playerLevel = 1;
+    saveData.playerAttack = 1;
+  } else if (action === "change-attack") {
+    const attack = Number(value);
+    if (!Number.isFinite(attack) || attack < 0) {
+      return res.status(400).json({ message: "攻撃力には0以上の数値を入力してください。" });
+    }
+    saveData.playerAttack = Math.floor(attack);
+  } else {
+    return res.status(400).json({ message: "不明な神の手アクションです。" });
+  }
+
+  saveSaveData(saveData);
   return res.json({
+    gameState: getGameState(saveData),
+    canBattle: saveData.lastBattleDate !== saveData.currentDate,
+  });
+});
+
+function getGameState(saveData) {
+  const bossStats = getBossStats(saveData.bossMonth);
+  return {
     bossHp: saveData.bossHp,
     bossMaxHp: saveData.bossMaxHp,
     bossMonth: saveData.bossMonth,
     bossAttack: bossStats.attack,
     bossDefense: bossStats.defense,
     bossSpeed: bossStats.speed,
-    canBattle: true,
-  });
-});
+    currentDate: saveData.currentDate,
+    playerLevel: saveData.playerLevel,
+    playerAttack: saveData.playerAttack,
+  };
+}
 
 function getBossStats(bossMonth) {
   const monthIndex = bossMonth - 1;
@@ -102,6 +122,19 @@ function getToday() {
   return `${year}-${month}-${day}`;
 }
 
+function addDays(dateValue, days) {
+  const date = new Date(`${dateValue}T00:00:00`);
+  date.setDate(date.getDate() + days);
+  return formatDate(date);
+}
+
+function formatDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 function loadSaveData() {
   try {
     const saved = JSON.parse(fs.readFileSync(saveFile, "utf8"));
@@ -109,12 +142,20 @@ function loadSaveData() {
       return { ...defaultSaveData };
     }
     const bossStats = getBossStats(saved.bossMonth);
+    const savedBossHp = Number(saved.bossHp);
     return {
       ...defaultSaveData,
       ...saved,
+      currentDate: saved.currentDate || getToday(),
+      playerLevel: Number.isInteger(saved.playerLevel) && saved.playerLevel >= 1
+        ? saved.playerLevel
+        : 1,
+      playerAttack: Number.isFinite(Number(saved.playerAttack)) && Number(saved.playerAttack) >= 0
+        ? Math.floor(Number(saved.playerAttack))
+        : 1,
       bossMaxHp: bossStats.hp,
       bossHp: Math.min(
-        Math.max(Number(saved.bossHp) || bossStats.hp, 0),
+        Math.max(Number.isFinite(savedBossHp) ? savedBossHp : bossStats.hp, 0),
         bossStats.hp,
       ),
     };

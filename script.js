@@ -33,6 +33,7 @@ const levelUpEffect = document.querySelector("#levelUpEffect");
 const statusButton = document.querySelector("#statusButton");
 const statusPanel = document.querySelector("#statusPanel");
 const statElements = {
+  level: document.querySelector("#statLevel"),
   hp: document.querySelector("#statHp"),
   attack: document.querySelector("#statAttack"),
   defense: document.querySelector("#statDefense"),
@@ -53,6 +54,13 @@ const bossSpeedElement = document.querySelector("#bossSpeed");
 const bossImage = document.querySelector("#bossImage");
 const battleMessage = document.querySelector("#battleMessage");
 const battleResetButton = document.querySelector("#battleResetButton");
+const godModePanel = document.querySelector("#godModePanel");
+const advanceDayButton = document.querySelector("#advanceDayButton");
+const killBossButton = document.querySelector("#killBossButton");
+const godModeResetButton = document.querySelector("#godModeResetButton");
+const attackChangeForm = document.querySelector("#attackChangeForm");
+const attackChangeInput = document.querySelector("#attackChangeInput");
+const godModeMessage = document.querySelector("#godModeMessage");
 const loginButton = document.querySelector("#loginButton");
 const logoutButton = document.querySelector("#logoutButton");
 const userProfile = document.querySelector("#userProfile");
@@ -139,21 +147,48 @@ async function loadBattleStatus() {
 }
 
 battleResetButton.addEventListener("click", async () => {
-  battleResetButton.disabled = true;
-  try {
-    const response = await fetch("/api/auto-battle/reset", { method: "POST" });
-    if (!response.ok) throw new Error("reset failed");
-    const result = await response.json();
-    battleDone = false;
-    updateBossStatus(result);
-    autoBattleButton.disabled = false;
-    battleMessage.textContent = "未戦闘・HP満タンにリセットしました。";
-  } catch {
-    battleMessage.textContent = "戦闘リセットに失敗しました。";
-  } finally {
-    battleResetButton.disabled = false;
-  }
+  godModePanel.hidden = !godModePanel.hidden;
 });
+
+advanceDayButton.addEventListener("click", () => runGodModeAction("advance-day"));
+killBossButton.addEventListener("click", () => runGodModeAction("kill-boss"));
+godModeResetButton.addEventListener("click", () => runGodModeAction("reset"));
+attackChangeForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  runGodModeAction("change-attack", attackChangeInput.value);
+});
+
+async function runGodModeAction(action, value = null) {
+  godModeMessage.textContent = "処理中...";
+  const controls = [
+    advanceDayButton,
+    killBossButton,
+    godModeResetButton,
+    attackChangeForm.querySelector("button"),
+  ];
+  controls.forEach((control) => {
+    control.disabled = true;
+  });
+  try {
+    const response = await fetch("/api/god-mode", {
+      body: JSON.stringify({ action, value }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message);
+    updateGameState(result.gameState);
+    battleDone = !result.canBattle;
+    autoBattleButton.disabled = battleDone;
+    godModeMessage.textContent = "ゲーム状態を更新しました。";
+  } catch (error) {
+    godModeMessage.textContent = error.message || "更新に失敗しました。";
+  } finally {
+    controls.forEach((control) => {
+      control.disabled = false;
+    });
+  }
+}
 
 function updateBossHp(bossHp, bossMaxHp) {
   bossHpElement.textContent = `${bossHp} / ${bossMaxHp}`;
@@ -168,6 +203,21 @@ function updateBossStatus(result) {
   bossDefenseElement.textContent = result.bossDefense;
   bossSpeedElement.textContent = result.bossSpeed;
   updateBossImage(result.bossMonth);
+  updatePlayerStatus(result);
+}
+
+function updateGameState(gameState) {
+  updateBossStatus(gameState);
+  if (gameState.currentDate) {
+    displayedDate = new Date(`${gameState.currentDate}T00:00:00`);
+    dateInput.value = gameState.currentDate;
+    renderCalendar();
+  }
+}
+
+function updatePlayerStatus(gameState) {
+  statElements.level.textContent = gameState.playerLevel;
+  statElements.attack.textContent = gameState.playerAttack;
 }
 
 function updateBossImage(bossMonth = displayedDate.getMonth() + 1) {
@@ -435,8 +485,10 @@ function openFormForEvent(eventIndex) {
 }
 
 function renderStats() {
-  Object.entries(statElements).forEach(([stat, element]) => {
-    element.textContent = stats[stat];
+  Object.entries(stats).forEach(([stat, value]) => {
+    const element = statElements[stat];
+    if (!element) return;
+    element.textContent = value;
   });
 }
 

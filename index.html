@@ -57,8 +57,19 @@
           class="battle-reset-button"
           type="button"
         >
-          🛑 神の手 (戦闘リセット)
+          神の手
         </button>
+        <section id="godModePanel" class="god-mode-panel" hidden aria-label="デモ・テスト用の神の手">
+          <h2>神の手</h2>
+          <button id="advanceDayButton" type="button">翌日に移動</button>
+          <button id="killBossButton" type="button">ボスをKILL</button>
+          <button id="godModeResetButton" type="button">戦闘リセット</button>
+          <form id="attackChangeForm">
+            <label>攻撃力変更<input id="attackChangeInput" type="number" min="0" step="1" required /></label>
+            <button type="submit">決定</button>
+          </form>
+          <p id="godModeMessage" role="status"></p>
+        </section>
         <section
           id="statusPanel"
           class="status-panel"
@@ -67,6 +78,10 @@
         >
           <h2>能力</h2>
           <dl>
+            <div>
+              <dt>レベル</dt>
+              <dd id="statLevel">1</dd>
+            </div>
             <div>
               <dt>HP</dt>
               <dd id="statHp">1</dd>
