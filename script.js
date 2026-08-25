@@ -196,7 +196,7 @@ function getBattleTurnMessage(turn) {
     return `自分の攻撃！ 相手に${turn.damage}ダメージ！`;
   }
   if (turn.damage === 0) {
-    return "相手の攻撃！ 防御してダメージを受けませんでした。";
+    return "相手の攻撃！ 自分が1ダメージを受けました。";
   }
   return `相手の攻撃！ 自分が${turn.damage}ダメージを受けました。`;
 }
